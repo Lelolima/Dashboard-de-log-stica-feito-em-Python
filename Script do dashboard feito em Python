@@ -1,0 +1,738 @@
+import dash
+from dash import dcc, html, Input, Output, State, callback_context
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import json
+import os
+from dash.exceptions import PreventUpdate
+import numpy as np
+from datetime import datetime
+
+# Define functions for data loading and processing
+def load_data():
+    """Load data from JSON file with proper error handling"""
+    json_filename = "deliveries.json"
+    
+    # Check if file exists, if not download it
+    if not os.path.exists(json_filename):
+        try:
+            import requests
+            url =https://github.com/Lelolima/Dashboard-de-log-stica-feito-em-Python
+            print(f"Downloading data from {url}...")
+            r = requests.get(url, timeout=10)
+            r.raise_for_status()  # Raise exception for HTTP errors
+            
+            with open(json_filename, "w", encoding="utf8") as f:
+                f.write(r.text)
+            print("Download completed successfully.")
+        except Exception as e:
+            print(f"Error downloading data: {str(e)}")
+            # Create a minimal sample dataset in case download fails
+            return create_sample_dataset()
+    
+    # Load the data
+    try:
+        with open(json_filename, "r", encoding="utf8") as f:
+            data = json.load(f)
+        return data
+    except Exception as e:
+        print(f"Error loading JSON data: {str(e)}")
+        return create_sample_dataset()
+
+def create_sample_dataset():
+    """Create a minimal sample dataset for when data loading fails"""
+    return [
+        {
+            "origin": {
+                "region": "Sample Region",
+                "name": "Sample Hub",
+                "lat": -15.0,
+                "lng": -50.0,
+                "vehicle_capacity": 100
+            },
+            "deliveries": [
+                {"id": "SAMPLE-1", "destination": {"lat": -15.1, "lng": -50.1}},
+                {"id": "SAMPLE-2", "destination": {"lat": -15.2, "lng": -50.2}}
+            ]
+        }
+    ]
+
+def process_data(data):
+    """Process raw data into DataFrame with proper error handling"""
+    try:
+        # Create a DataFrame from the raw data
+        df = pd.DataFrame(data)
+        
+        # Extract nested origin data
+        hub_origin_df = pd.json_normalize(df["origin"])
+        df = pd.concat([df.drop("origin", axis=1), hub_origin_df], axis=1)
+        
+        # Count deliveries per hub
+        df["num_deliveries"] = df["deliveries"].apply(lambda x: len(x) if isinstance(x, list) else 0)
+        
+        # Calculate delivery density (deliveries per vehicle capacity)
+        df["delivery_density"] = df["num_deliveries"] / df["vehicle_capacity"]
+        
+        # Create a unique ID for each hub
+        df["hub_id"] = df["region"] + "-" + df["name"]
+        
+        # Extract all destination coordinates for detailed mapping
+        all_destinations = []
+        for idx, row in df.iterrows():
+            hub_name = row["name"]
+            hub_region = row["region"]
+            hub_lat = row["lat"]
+            hub_lng = row["lng"]
+            if isinstance(row["deliveries"], list):
+                for delivery in row["deliveries"]:
+                    if "destination" in delivery and "lat" in delivery["destination"] and "lng" in delivery["destination"]:
+                        all_destinations.append({
+                            "hub_name": hub_name,
+                            "hub_region": hub_region,
+                            "delivery_id": delivery.get("id", "Unknown"),
+                            "hub_lat": hub_lat,
+                            "hub_lng": hub_lng,
+                            "dest_lat": delivery["destination"]["lat"],
+                            "dest_lng": delivery["destination"]["lng"]
+                        })
+        destinations_df = pd.DataFrame(all_destinations)
+        
+        # Calculate distance for each delivery (simplified Euclidean distance)
+        if not destinations_df.empty:
+            destinations_df["distance"] = np.sqrt(
+                (destinations_df["hub_lat"] - destinations_df["dest_lat"])**2 +
+                (destinations_df["hub_lng"] - destinations_df["dest_lng"])**2
+            ) * 111  # Approximate conversion to kilometers (1 degree ≈ 111 km)
+        
+        return df, destinations_df
+    except Exception as e:
+        print(f"Error processing data: {str(e)}")
+        # Return empty DataFrames in case of processing error
+        return pd.DataFrame(), pd.DataFrame()
+
+# Load and process the data
+data = load_data()
+df, destinations_df = process_data(data)
+
+# Get available regions for filtering
+regions = df['region'].unique().tolist() if not df.empty else []
+dropdown_options = [{"label": "Todas as Regiões", "value": "all"}] + [{"label": r, "value": r} for r in regions]
+
+# Define color mapping for consistency across visualizations
+colors = px.colors.qualitative.Plotly
+color_map = {region: colors[i % len(colors)] for i, region in enumerate(regions)}
+
+# Initialize the Dash app with a professional theme
+app = dash.Dash(
+    __name__,
+    meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}]
+)
+app.title = "Dashboard de Logística - Loggi"
+
+# Define app layout with organization and responsividade
+app.layout = html.Div([
+    # Header section
+    html.Div([
+        html.H1("Dashboard Interativo de Dados de Logística", className="dashboard-title"),
+        html.P("Análise de operações de entrega e distribuição por região", className="dashboard-subtitle"),
+        html.Div([
+            html.Span("Última atualização: ", className="update-label"),
+            html.Span(datetime.now().strftime("%d/%m/%Y %H:%M"), id="update-time", className="update-time")
+        ], className="update-info")
+    ], className="header"),
+    
+    # Filters section
+    html.Div([
+        html.Div([
+            html.Label("Filtrar por Região:"),
+            dcc.Dropdown(
+                id="region-dropdown",
+                options=dropdown_options,
+                value="all",
+                clearable=False
+            )
+        ], className="filter-item"),
+        
+        html.Div([
+            html.Label("Ordenar Hubs por:"),
+            dcc.Dropdown(
+                id="sort-dropdown",
+                options=[
+                    {"label": "Número de Entregas (Maior → Menor)", "value": "num_deliveries-desc"},
+                    {"label": "Número de Entregas (Menor → Maior)", "value": "num_deliveries-asc"},
+                    {"label": "Capacidade do Veículo (Maior → Menor)", "value": "vehicle_capacity-desc"},
+                    {"label": "Capacidade do Veículo (Menor → Maior)", "value": "vehicle_capacity-asc"},
+                    {"label": "Nome do Hub (A → Z)", "value": "name-asc"},
+                    {"label": "Nome do Hub (Z → A)", "value": "name-desc"}
+                ],
+                value="num_deliveries-desc",
+                clearable=False
+            )
+        ], className="filter-item")
+    ], className="filters-container"),
+    
+    # Metrics cards
+    html.Div([
+        html.Div([
+            html.H3("Total de Hubs", className="metric-title"),
+            html.Div(id="metric-total-hubs", className="metric-value")
+        ], className="metric-card"),
+        html.Div([
+            html.H3("Total de Entregas", className="metric-title"),
+            html.Div(id="metric-total-deliveries", className="metric-value")
+        ], className="metric-card"),
+        html.Div([
+            html.H3("Capacidade Total", className="metric-title"),
+            html.Div(id="metric-total-capacity", className="metric-value")
+        ], className="metric-card"),
+        html.Div([
+            html.H3("Média de Entregas/Hub", className="metric-title"),
+            html.Div(id="metric-avg-deliveries", className="metric-value")
+        ], className="metric-card")
+    ], className="metrics-container"),
+    
+    # Main content section
+    html.Div([
+        # Map and charts layout
+        html.Div([
+            # Map section
+            html.Div([
+                html.H2("Distribuição Geográfica", className="section-title"),
+                html.Div([
+                    dcc.RadioItems(
+                        id="map-view-selector",
+                        options=[
+                            {'label': 'Visualizar Hubs', 'value': 'hubs'},
+                            {'label': 'Visualizar Entregas', 'value': 'deliveries'}
+                        ],
+                        value='hubs',
+                        className="radio-items"
+                    )
+                ], className="map-controls"),
+                dcc.Loading(
+                    id="loading-map",
+                    type="circle",
+                    children=dcc.Graph(id="map-graph", className="graph-container")
+                )
+            ], className="map-section"),
+            # Charts section
+            html.Div([
+                html.Div([
+                    html.H2("Entregas por Hub", className="section-title"),
+                    dcc.Loading(
+                        id="loading-bar",
+                        type="circle",
+                        children=dcc.Graph(id="bar-chart", className="graph-container")
+                    )
+                ], className="chart-box"),
+                html.Div([
+                    html.H2("Utilização de Capacidade", className="section-title"),
+                    dcc.Loading(
+                        id="loading-utilization",
+                        type="circle",
+                        children=dcc.Graph(id="utilization-chart", className="graph-container")
+                    )
+                ], className="chart-box")
+            ], className="charts-section")
+        ], className="main-content"),
+        
+        # Additional insights section
+        html.Div([
+            html.H2("Análise de Desempenho por Região", className="section-title"),
+            dcc.Loading(
+                id="loading-region-analysis",
+                type="circle",
+                children=dcc.Graph(id="region-comparison", className="graph-container")
+            )
+        ], className="insights-section")
+    ], className="content-container"),
+    
+    # Footer section
+    html.Footer([
+        html.Div([
+            html.P("Dashboard criado por: Wellington de Lima Catarina", className="footer-text"),
+            html.P("Dados fornecidos pela Loggi para fins educacionais", className="footer-text")
+        ], className="footer-content")
+    ], className="footer"),
+    
+    # CSS Styling
+    html.Style('''
+        /* Main layout */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .dashboard-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .dashboard-subtitle {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-top: 0;
+        }
+        
+        .header {
+            background-color: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            margin: 15px;
+        }
+        
+        .update-info {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 10px;
+        }
+        
+        .filters-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 15px;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .filter-item {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .metrics-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 15px;
+        }
+        
+        .metric-card {
+            flex: 1;
+            min-width: 170px;
+            background-color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .metric-title {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2980b9;
+        }
+        
+        .content-container {
+            margin: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .map-section {
+            flex: 1.5;
+            min-width: 350px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .charts-section {
+            flex: 1;
+            min-width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .chart-box {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+        
+        .insights-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .graph-container {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .footer {
+            margin: 0 15px 15px 15px;
+            padding: 15px 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .footer-text {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .map-controls {
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .radio-items {
+            display: flex;
+            gap: 15px;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .metrics-container {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .main-content {
+                flex-direction: column;
+            }
+        }
+    ''')
+])
+
+# Callbacks
+@app.callback(
+    [
+        Output("metric-total-hubs", "children"),
+        Output("metric-total-deliveries", "children"),
+        Output("metric-total-capacity", "children"),
+        Output("metric-avg-deliveries", "children")
+    ],
+    [Input("region-dropdown", "value")]
+)
+def update_metrics(selected_region):
+    """Update the metrics cards based on region selection"""
+    if df.empty:
+        return "0", "0", "0", "0"
+    filtered_df = df if selected_region == "all" else df[df['region'] == selected_region]
+    if filtered_df.empty:
+        return "0", "0", "0", "0"
+    total_hubs = len(filtered_df)
+    total_deliveries = filtered_df["num_deliveries"].sum()
+    total_capacity = filtered_df["vehicle_capacity"].sum()
+    avg_deliveries = round(total_deliveries / total_hubs, 1) if total_hubs > 0 else 0
+    total_deliveries_fmt = f"{total_deliveries:,}".replace(",", ".")
+    total_capacity_fmt = f"{total_capacity:,}".replace(",", ".")
+    return str(total_hubs), total_deliveries_fmt, total_capacity_fmt, str(avg_deliveries)
+
+@app.callback(
+    Output("map-graph", "figure"),
+    [Input("region-dropdown", "value"),
+     Input("map-view-selector", "value")]
+)
+def update_map(selected_region, map_view):
+    """Update the map visualization based on region selection and map view choice"""
+    if df.empty:
+        return go.Figure().update_layout(
+            title="Dados não disponíveis",
+            annotations=[dict(
+                text="Não foi possível carregar os dados do mapa.",
+                showarrow=False,
+                xref="paper", yref="paper",
+                x=0.5, y=0.5
+            )]
+        )
+    filtered_df = df if selected_region == "all" else df[df['region'] == selected_region]
+    if filtered_df.empty:
+        return go.Figure().update_layout(
+            title="Sem dados para a região selecionada",
+            annotations=[dict(
+                text="Não há dados disponíveis para a região selecionada.",
+                showarrow=False,
+                xref="paper", yref="paper",
+                x=0.5, y=0.5
+            )]
+        )
+    if map_view == 'hubs':
+        fig = px.scatter_mapbox(
+            filtered_df,
+            lat="lat", 
+            lon="lng",
+            size="num_deliveries",
+            size_max=30,
+            color="region",
+            hover_name="name",
+            hover_data={
+                "region": True,
+                "vehicle_capacity": True,
+                "num_deliveries": True,
+                "lat": False,
+                "lng": False
+            },
+            zoom=4,
+            height=500,
+            color_discrete_map=color_map
+        )
+        fig.update_layout(
+            mapbox_style="carto-positron",
+            mapbox=dict(
+                center=dict(
+                    lat=filtered_df['lat'].mean(),
+                    lon=filtered_df['lng'].mean()
+                )
+            ),
+            margin={"r":0, "t":0, "l":0, "b":0},
+            legend_title_text="Região"
+        )
+    else:  # map_view == 'deliveries'
+        if destinations_df.empty:
+            return go.Figure().update_layout(
+                title="Dados de entregas não disponíveis",
+                annotations=[dict(
+                    text="Não foi possível carregar os dados de entregas.",
+                    showarrow=False,
+                    xref="paper", yref="paper",
+                    x=0.5, y=0.5
+                )]
+            )
+        filtered_dest_df = destinations_df if selected_region == "all" else destinations_df[destinations_df['hub_region'] == selected_region]
+        fig = go.Figure()
+        for hub_name in filtered_dest_df['hub_name'].unique():
+            hub_data = filtered_dest_df[filtered_dest_df['hub_name'] == hub_name]
+            if not hub_data.empty:
+                first_row = hub_data.iloc[0]
+                hub_region = first_row['hub_region']
+                hub_color = color_map.get(hub_region, 'blue')
+                for _, row in hub_data.iterrows():
+                    fig.add_trace(go.Scattermapbox(
+                        mode="lines",
+                        lon=[row['hub_lng'], row['dest_lng']],
+                        lat=[row['hub_lat'], row['dest_lat']],
+                        line=dict(width=1, color=hub_color, opacity=0.5),
+                        hoverinfo="none",
+                        showlegend=False
+                    ))
+                fig.add_trace(go.Scattermapbox(
+                    mode="markers",
+                    lon=[first_row['hub_lng']],
+                    lat=[first_row['hub_lat']],
+                    marker=dict(size=15, color=hub_color, opacity=0.9),
+                    text=[hub_name],
+                    hoverinfo="text",
+                    name=f"{hub_name} ({hub_region})"
+                ))
+                fig.add_trace(go.Scattermapbox(
+                    mode="markers",
+                    lon=hub_data['dest_lng'],
+                    lat=hub_data['dest_lat'],
+                    marker=dict(size=5, color=hub_color, opacity=0.7),
+                    text=hub_data['delivery_id'],
+                    hoverinfo="text",
+                    showlegend=False
+                ))
+        fig.update_layout(
+            mapbox_style="carto-positron",
+            mapbox=dict(
+                center=dict(
+                    lat=filtered_dest_df['hub_lat'].mean() if not filtered_dest_df.empty else -15,
+                    lon=filtered_dest_df['hub_lng'].mean() if not filtered_dest_df.empty else -50
+                ),
+                zoom=4
+            ),
+            margin={"r":0, "t":0, "l":0, "b":0},
+            legend_title_text="Hubs",
+            height=500
+        )
+    return fig
+
+@app.callback(
+    Output("bar-chart", "figure"),
+    [Input("region-dropdown", "value"),
+     Input("sort-dropdown", "value")]
+)
+def update_bar_chart(selected_region, sort_option):
+    """Update the bar chart based on region selection and sorting option"""
+    if df.empty:
+        return go.Figure().update_layout(title="Dados não disponíveis")
+    filtered_df = df if selected_region == "all" else df[df['region'] == selected_region]
+    if filtered_df.empty:
+        return go.Figure().update_layout(title="Sem dados para a região selecionada")
+    sort_col, sort_dir = sort_option.split('-')
+    ascending = sort_dir == 'asc'
+    sorted_df = filtered_df.sort_values(by=sort_col, ascending=ascending)
+    fig = px.bar(
+        sorted_df,
+        x="name",
+        y="num_deliveries",
+        color="region",
+        color_discrete_map=color_map,
+        labels={"num_deliveries": "Número de Entregas", "name": "Hub", "region": "Região"},
+        text="num_deliveries",
+        height=300
+    )
+    fig.update_traces(texttemplate='%{text}', textposition='auto')
+    fig.update_layout(
+        xaxis_tickangle=-45,
+        margin=dict(l=20, r=20, t=30, b=70),
+        xaxis_title="",
+        yaxis_title="Número de Entregas",
+        legend_title_text="Região",
+        bargap=0.2
+    )
+    if len(sorted_df) > 10:
+        fig.update_layout(
+            xaxis=dict(
+                rangeslider=dict(visible=True),
+                range=[0, 9.5]
+            )
+        )
+    return fig
+
+@app.callback(
+    Output("utilization-chart", "figure"),
+    [Input("region-dropdown", "value")]
+)
+def update_utilization_chart(selected_region):
+    """Create a capacity utilization chart"""
+    if df.empty:
+        return go.Figure().update_layout(title="Dados não disponíveis")
+    filtered_df = df if selected_region == "all" else df[df['region'] == selected_region]
+    if filtered_df.empty:
+        return go.Figure().update_layout(title="Sem dados para a região selecionada")
+    filtered_df = filtered_df.copy()
+    filtered_df['utilization'] = filtered_df['num_deliveries'] / filtered_df['vehicle_capacity'] * 100
+    filtered_df['utilization'] = filtered_df['utilization'].round(1)
+    sorted_df = filtered_df.sort_values(by='utilization', ascending=False)
+    fig = px.bar(
+        sorted_df,
+        y="name",
+        x="utilization",
+        color="region",
+        color_discrete_map=color_map,
+        labels={"utilization": "Taxa de Utilização (%)", "name": "Hub", "region": "Região"},
+        text="utilization",
+        orientation='h',
+        height=300
+    )
+    fig.update_traces(texttemplate='%{text:.1f}%', textposition='auto')
+    avg_utilization = sorted_df['utilization'].mean()
+    fig.add_vline(
+        x=avg_utilization,
+        line_dash="dash",
+        line_color="gray",
+        annotation_text=f"Média: {avg_utilization:.1f}%",
+        annotation_position="top"
+    )
+    fig.update_layout(
+        margin=dict(l=20, r=20, t=30, b=20),
+        yaxis_title="",
+        xaxis_title="Taxa de Utilização (%)",
+        legend_title_text="Região",
+        bargap=0.2
+    )
+    if len(sorted_df) > 10:
+        fig.update_layout(
+            yaxis=dict(
+                rangeslider=dict(visible=True),
+                range=[-0.5, 9.5]
+            )
+        )
+    return fig
+
+@app.callback(
+    Output("region-comparison", "figure"),
+    [Input("region-dropdown", "value")]
+)
+def update_region_comparison(selected_region):
+    """Create a region comparison chart"""
+    if df.empty:
+        return go.Figure().update_layout(title="Dados não disponíveis")
+    if selected_region != "all":
+        filtered_df = df[df['region'] == selected_region]
+        if filtered_df.empty:
+            return go.Figure().update_layout(title="Sem dados para a região selecionada")
+        fig = px.scatter(
+            filtered_df,
+            x="vehicle_capacity",
+            y="num_deliveries",
+            size="delivery_density",
+            color="name",
+            hover_name="name",
+            labels={
+                "vehicle_capacity": "Capacidade do Veículo",
+                "num_deliveries": "Número de Entregas",
+                "delivery_density": "Densidade de Entregas",
+                "name": "Hub"
+            },
+            height=400
+        )
+        max_val = max(filtered_df["vehicle_capacity"].max(), filtered_df["num_deliveries"].max())
+        fig.add_trace(
+            go.Scatter(
+                x=[0, max_val],
+                y=[0, max_val],
+                mode="lines",
+                line=dict(color="gray", dash="dash"),
+                name="Utilização Perfeita (y=x)"
+            )
+        )
+        fig.update_layout(
+            title=f"Comparação de Hubs na Região {selected_region}",
+            xaxis_title="Capacidade do Veículo",
+            yaxis_title="Número de Entregas"
+        )
+    else:
+        df_grouped = df.groupby("region").agg({
+            "num_deliveries": "mean",
+            "vehicle_capacity": "sum"
+        }).reset_index()
+        fig = px.bar(
+            df_grouped,
+            x="region",
+            y="num_deliveries",
+            color="region",
+            color_discrete_map=color_map,
+            labels={"num_deliveries": "Média de Entregas", "region": "Região"},
+            height=400,
+            title="Média de Entregas por Região"
+        )
+    return fig
+
+# Run the server
+if __name__ == '__main__':
+    app.run_server(debug=True)
