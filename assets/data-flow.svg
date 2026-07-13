@@ -1,0 +1,128 @@
+<svg width="800" height="300" viewBox="0 0 800 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="flowGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="300" fill="#f8fafc" rx="12"/>
+
+  <!-- Título -->
+  <text x="400" y="35" font-size="16" font-weight="700" fill="#0f172a" text-anchor="middle" font-family="Inter, sans-serif">
+    🔄 Fluxo de Dados em Tempo Real
+  </text>
+
+  <!-- Fonte de Dados -->
+  <g transform="translate(50, 80)">
+    <rect x="0" y="0" width="120" height="80" rx="8" fill="white" stroke="#e2e8f0" stroke-width="2"/>
+    <text x="60" y="35" font-size="12" fill="#64748b" text-anchor="middle" font-family="Inter, sans-serif">📁 Fonte</text>
+    <text x="60" y="55" font-size="11" fill="#0f172a" text-anchor="middle" font-family="Inter, sans-serif">Local/API</text>
+    <!-- Pulsando -->
+    <rect x="0" y="0" width="120" height="80" rx="8" fill="none" stroke="#2563eb" stroke-width="2">
+      <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- Seta animada 1 -->
+  <g transform="translate(170, 110)">
+    <line x1="0" y1="0" x2="50" y2="0" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5">
+      <animate attributeName="stroke-dashoffset" values="10;0;10" dur="2s" repeatCount="indefinite"/>
+    </line>
+    <polygon points="50,0 40,-5 40,5" fill="#2563eb"/>
+  </g>
+
+  <!-- DataLoader -->
+  <g transform="translate(230, 80)">
+    <rect x="0" y="0" width="120" height="80" rx="8" fill="white" stroke="#2563eb" stroke-width="2"/>
+    <text x="60" y="35" font-size="12" fill="#64748b" text-anchor="middle" font-family="Inter, sans-serif">⚙️ DataLoader</text>
+    <text x="60" y="55" font-size="11" fill="#0f172a" text-anchor="middle" font-family="Inter, sans-serif">Carrega + Valida</text>
+    <!-- Ícone animado -->
+    <circle cx="60" cy="65" r="8" fill="none" stroke="#2563eb" stroke-width="2">
+      <animateTransform attributeName="transform" type="rotate" from="0 60 65" to="360 60 65" dur="4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Seta animada 2 -->
+  <g transform="translate(350, 110)">
+    <line x1="0" y1="0" x2="50" y2="0" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5">
+      <animate attributeName="stroke-dashoffset" values="10;0;10" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+    </line>
+    <polygon points="50,0 40,-5 40,5" fill="#2563eb"/>
+  </g>
+
+  <!-- DataProcessor -->
+  <g transform="translate(410, 80)">
+    <rect x="0" y="0" width="120" height="80" rx="8" fill="white" stroke="#10b981" stroke-width="2"/>
+    <text x="60" y="35" font-size="12" fill="#64748b" text-anchor="middle" font-family="Inter, sans-serif">📊 Processor</text>
+    <text x="60" y="55" font-size="11" fill="#0f172a" text-anchor="middle" font-family="Inter, sans-serif">Calcula Métricas</text>
+    <!-- Barras animadas -->
+    <rect x="40" y="60" width="8" height="0" fill="#10b981">
+      <animate attributeName="height" values="0;15;0" dur="1s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="52" y="60" width="8" height="0" fill="#10b981">
+      <animate attributeName="height" values="0;20;0" dur="1s" begin="0.2s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="64" y="60" width="8" height="0" fill="#10b981">
+      <animate attributeName="height" values="0;12;0" dur="1s" begin="0.4s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- Seta animada 3 -->
+  <g transform="translate(530, 110)">
+    <line x1="0" y1="0" x2="50" y2="0" stroke="#94a3b8" stroke-width="2" stroke-dasharray="5 5">
+      <animate attributeName="stroke-dashoffset" values="10;0;10" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+    </line>
+    <polygon points="50,0 40,-5 40,5" fill="#2563eb"/>
+  </g>
+
+  <!-- Visualização -->
+  <g transform="translate(590, 80)">
+    <rect x="0" y="0" width="160" height="80" rx="8" fill="white" stroke="#8b5cf6" stroke-width="2"/>
+    <text x="80" y="35" font-size="12" fill="#64748b" text-anchor="middle" font-family="Inter, sans-serif">🎨 Dashboard</text>
+    <text x="80" y="55" font-size="11" fill="#0f172a" text-anchor="middle" font-family="Inter, sans-serif">Gráficos + KPIs</text>
+    <!-- Gráfico mini animado -->
+    <rect x="60" y="60" width="12" height="0" fill="#8b5cf6">
+      <animate attributeName="height" values="0;25;0" dur="1.5s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="76" y="60" width="12" height="0" fill="#8b5cf6">
+      <animate attributeName="height" values="0;18;0" dur="1.5s" begin="0.3s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="92" y="60" width="12" height="0" fill="#8b5cf6">
+      <animate attributeName="height" values="0;22;0" dur="1.5s" begin="0.6s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="108" y="60" width="12" height="0" fill="#8b5cf6">
+      <animate attributeName="height" values="0;28;0" dur="1.5s" begin="0.9s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- Linha de feedback -->
+  <path d="M 670 160 C 670 200 130 200 130 160" stroke="#e2e8f0" stroke-width="2" stroke-dasharray="5 5" fill="none">
+    <animate attributeName="stroke-dashoffset" values="0;-540" dur="10s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- Label de feedback -->
+  <text x="400" y="235" font-size="11" fill="#64748b" text-anchor="middle" font-family="Inter, sans-serif">
+    🔁 Callbacks atualizam filtros em tempo real
+  </text>
+
+  <!-- Cache Badge -->
+  <g transform="translate(350, 250)">
+    <rect x="0" y="0" width="100" height="28" rx="6" fill="#f1f5f9"/>
+    <text x="50" y="18" font-size="10" fill="#64748b" text-anchor="middle" font-family="Inter, sans-serif">💾 Cache Diskcache</text>
+  </g>
+
+  <!-- Performance Badge -->
+  <g transform="translate(470, 250)">
+    <rect x="0" y="0" width="90" height="28" rx="6" fill="#ecfdf5"/>
+    <text x="45" y="18" font-size="10" fill="#10b981" text-anchor="middle" font-family="Inter, sans-serif">⚡ < 200ms updates</text>
+  </g>
+</svg>

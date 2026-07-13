@@ -1,0 +1,155 @@
+<svg width="700" height="500" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="filterGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8fafc;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="sidebarGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f1f5f9;stop-opacity:1" />
+    </linearGradient>
+    <filter id="elevatedShadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="700" height="500" fill="url(#filterGradient)"/>
+
+  <!-- Sidebar de Filtros -->
+  <rect x="20" y="20" width="200" height="460" rx="12" fill="url(#sidebarGradient)" filter="url(#elevatedShadow)"/>
+
+  <!-- Header da Sidebar -->
+  <rect x="20" y="20" width="200" height="50" rx="12" fill="#2563eb"/>
+  <text x="40" y="45" font-size="14" font-weight="600" fill="white" font-family="Inter, sans-serif">🎛️ Filtros</text>
+
+  <!-- Checklists animados -->
+  <g font-family="Inter, sans-serif" font-size="12">
+    <!-- Estado -->
+    <text x="35" y="95" font-weight="600" fill="#0f172a">Estado (UF)</text>
+    <g id="stateFilters">
+      <g>
+        <rect x="35" y="105" width="16" height="16" rx="4" fill="#2563eb">
+          <animate attributeName="fill" values="#2563eb;#1d4ed8;#2563eb" dur="2s" repeatCount="indefinite"/>
+        </rect>
+        <text x="58" y="118" fill="#64748b">SP</text>
+      </g>
+      <g>
+        <rect x="35" y="128" width="16" height="16" rx="4" fill="#2563eb">
+          <animate attributeName="fill" values="#2563eb;#1d4ed8;#2563eb" dur="2s" begin="0.2s" repeatCount="indefinite"/>
+        </rect>
+        <text x="58" y="141" fill="#64748b">RJ</text>
+      </g>
+      <g>
+        <rect x="35" y="151" width="16" height="16" rx="4" fill="#e2e8f0"/>
+        <text x="58" y="164" fill="#64748b">MG</text>
+      </g>
+    </g>
+
+    <!-- Cidade -->
+    <text x="35" y="190" font-weight="600" fill="#0f172a">Cidade</text>
+    <g id="cityFilters">
+      <g>
+        <rect x="35" y="200" width="16" height="16" rx="4" fill="#2563eb">
+          <animate attributeName="fill" values="#2563eb;#1d4ed8;#2563eb" dur="2s" begin="0.4s" repeatCount="indefinite"/>
+        </rect>
+        <text x="58" y="213" fill="#64748b">São Paulo</text>
+      </g>
+      <g>
+        <rect x="35" y="223" width="16" height="16" rx="4" fill="#e2e8f0"/>
+        <text x="58" y="236" fill="#64748b">Rio de Janeiro</text>
+      </g>
+    </g>
+
+    <!-- Status -->
+    <text x="35" y="270" font-weight="600" fill="#0f172a">Status</text>
+    <g id="statusFilters">
+      <g>
+        <rect x="35" y="280" width="16" height="16" rx="4" fill="#10b981">
+          <animate attributeName="fill" values="#10b981;#059669;#10b981" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+        </rect>
+        <text x="58" y="293" fill="#64748b">✅ Entregue</text>
+      </g>
+      <g>
+        <rect x="35" y="303" width="16" height="16" rx="4" fill="#2563eb">
+          <animate attributeName="fill" values="#2563eb;#1d4ed8;#2563eb" dur="2s" begin="0.8s" repeatCount="indefinite"/>
+        </rect>
+        <text x="58" y="316" fill="#64748b">🚚 Em Trânsito</text>
+      </g>
+      <g>
+        <rect x="35" y="326" width="16" height="16" rx="4" fill="#f59e0b">
+          <animate attributeName="fill" values="#f59e0b;#d97706;#f59e0b" dur="2s" begin="1s" repeatCount="indefinite"/>
+        </rect>
+        <text x="58" y="339" fill="#64748b">⏳ Pendente</text>
+      </g>
+      <g>
+        <rect x="35" y="349" width="16" height="16" rx="4" fill="#e2e8f0"/>
+        <text x="58" y="362" fill="#64748b">❌ Cancelada</text>
+      </g>
+    </g>
+
+    <!-- Botões -->
+    <rect x="35" y="390" width="80" height="32" rx="6" fill="#2563eb">
+      <animate attributeName="opacity" values="0.8;1;0.8" dur="2s" repeatCount="indefinite"/>
+    </rect>
+    <text x="75" y="410" font-size="11" fill="white" text-anchor="middle" font-weight="500">Aplicar</text>
+
+    <rect x="125" y="390" width="80" height="32" rx="6" fill="#ef4444" opacity="0.8"/>
+    <text x="165" y="410" font-size="11" fill="white" text-anchor="middle" font-weight="500">Limpar</text>
+  </g>
+
+  <!-- Área Principal -->
+  <rect x="240" y="20" width="440" height="210" rx="12" fill="white" filter="url(#elevatedShadow)"/>
+  <text x="260" y="50" font-size="14" font-weight="600" fill="#0f172a" font-family="Inter, sans-serif">📊 Atualização em Tempo Real</text>
+
+  <!-- Indicador de atualização -->
+  <g transform="translate(500, 40)">
+    <circle cx="0" cy="0" r="6" fill="#10b981">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1s" repeatCount="indefinite"/>
+    </circle>
+    <text x="12" y="4" font-size="11" fill="#10b981" font-family="Inter, sans-serif">Atualizando...</text>
+  </g>
+
+  <!-- Gráfico animado -->
+  <g transform="translate(260, 80)">
+    <!-- Eixos -->
+    <line x1="0" y1="100" x2="400" y2="100" stroke="#e2e8f0" stroke-width="2"/>
+    <line x1="0" y1="0" x2="0" y2="100" stroke="#e2e8f0" stroke-width="2"/>
+
+    <!-- Barras animadas -->
+    <rect x="20" y="100" width="50" height="0" fill="#2563eb" rx="4">
+      <animate attributeName="height" values="0;80;0" dur="3s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="100;20;100" dur="3s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="90" y="100" width="50" height="0" fill="#10b981" rx="4">
+      <animate attributeName="height" values="0;60;0" dur="3s" begin="0.3s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="100;40;100" dur="3s" begin="0.3s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="160" y="100" width="50" height="0" fill="#f59e0b" rx="4">
+      <animate attributeName="height" values="0;90;0" dur="3s" begin="0.6s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="100;10;100" dur="3s" begin="0.6s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="230" y="100" width="50" height="0" fill="#8b5cf6" rx="4">
+      <animate attributeName="height" values="0;50;0" dur="3s" begin="0.9s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="100;50;100" dur="3s" begin="0.9s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="300" y="100" width="50" height="0" fill="#ec4899" rx="4">
+      <animate attributeName="height" values="0;70;0" dur="3s" begin="1.2s" repeatCount="indefinite"/>
+      <animate attributeName="y" values="100;30;100" dur="3s" begin="1.2s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- Tooltip animado -->
+  <g transform="translate(330, 60)" opacity="0">
+    <rect x="-40" y="-25" width="80" height="25" rx="6" fill="#0f172a" opacity="0.9"/>
+    <text x="0" y="-8" font-size="10" fill="white" text-anchor="middle" font-family="Inter, sans-serif">1,234 entregas</text>
+    <animate attributeName="opacity" values="0;1;1;0" dur="4s" begin="1s" repeatCount="indefinite"/>
+    <animate attributeName="transform" values="translate(330,60);translate(330,55);translate(330,60)" dur="4s" begin="1s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- Badge de feature -->
+  <g transform="translate(620, 470)">
+    <rect x="0" y="0" width="70" height="24" rx="6" fill="url(#filterGradient)" stroke="#2563eb" stroke-width="2"/>
+    <text x="35" y="16" font-size="10" fill="#2563eb" text-anchor="middle" font-weight="600" font-family="Inter, sans-serif">✨ REAL-TIME</text>
+  </g>
+</svg>

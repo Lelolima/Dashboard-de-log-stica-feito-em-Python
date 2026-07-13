@@ -1,0 +1,157 @@
+<svg width="800" height="450" viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+  <!-- Fundo do Dashboard -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f8fafc;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e2e8f0;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="cardGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f1f5f9;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="primaryGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="450" fill="url(#bgGradient)"/>
+
+  <!-- Header -->
+  <rect x="20" y="20" width="760" height="60" rx="12" fill="url(#cardGradient)" filter="url(#shadow)"/>
+  <circle cx="50" cy="50" r="20" fill="url(#primaryGradient)"/>
+  <text x="50" y="55" font-size="14" fill="white" text-anchor="middle" font-family="Inter, sans-serif">📊</text>
+  <text x="80" y="45" font-size="18" font-weight="700" fill="#2563eb" font-family="Inter, sans-serif">Dashboard Logística</text>
+  <text x="80" y="62" font-size="11" fill="#64748b" font-family="Inter, sans-serif">Análise de Entregas Loggi</text>
+
+  <!-- Botões do Header -->
+  <g opacity="0.8">
+    <rect x="680" y="35" width="32" height="32" rx="6" fill="#e2e8f0"/>
+    <text x="696" y="57" font-size="16" text-anchor="middle">🌙</text>
+    <rect x="720" y="35" width="90" height="32" rx="6" fill="#10b981"/>
+    <text x="765" y="57" font-size="12" fill="white" text-anchor="middle" font-family="Inter, sans-serif">📥 Exportar</text>
+  </g>
+
+  <!-- KPI Cards -->
+  <g id="kpiRow">
+    <!-- Card 1 -->
+    <rect x="20" y="95" width="180" height="85" rx="12" fill="url(#cardGradient)" filter="url(#shadow)"/>
+    <text x="35" y="120" font-size="11" fill="#64748b" font-family="Inter, sans-serif">📦 Total Entregas</text>
+    <text x="35" y="150" font-size="28" font-weight="700" fill="#2563eb" font-family="Inter, sans-serif">12,458</text>
+    <text x="35" y="168" font-size="10" fill="#10b981" font-family="Inter, sans-serif">📈 +12% vs mês anterior</text>
+
+    <!-- Card 2 -->
+    <rect x="215" y="95" width="180" height="85" rx="12" fill="url(#cardGradient)" filter="url(#shadow)"/>
+    <text x="230" y="120" font-size="11" fill="#64748b" font-family="Inter, sans-serif">✅ Taxa Sucesso</text>
+    <text x="230" y="150" font-size="28" font-weight="700" fill="#10b981" font-family="Inter, sans-serif">87.3%</text>
+    <text x="230" y="168" font-size="10" fill="#10b981" font-family="Inter, sans-serif">📈 +2.5% esta semana</text>
+
+    <!-- Card 3 -->
+    <rect x="410" y="95" width="180" height="85" rx="12" fill="url(#cardGradient)" filter="url(#shadow)"/>
+    <text x="425" y="120" font-size="11" fill="#64748b" font-family="Inter, sans-serif">⏳ Em Andamento</text>
+    <text x="425" y="150" font-size="28" font-weight="700" fill="#f59e0b" font-family="Inter, sans-serif">1,586</text>
+    <text x="425" y="168" font-size="10" fill="#64748b" font-family="Inter, sans-serif">982 pendentes • 604 em trânsito</text>
+
+    <!-- Card 4 -->
+    <rect x="605" y="95" width="175" height="85" rx="12" fill="url(#cardGradient)" filter="url(#shadow)"/>
+    <text x="620" y="120" font-size="11" fill="#64748b" font-family="Inter, sans-serif">🕐 Última Atualização</text>
+    <text x="620" y="145" font-size="16" font-weight="600" fill="#0f172a" font-family="Inter, sans-serif">13/07/2026 10:45</text>
+    <g id="syncIndicator">
+      <circle cx="625" cy="165" r="5" fill="#10b981">
+        <animate attributeName="opacity" values="1;0.3;1" dur="2s" repeatCount="indefinite"/>
+      </circle>
+      <text x="635" y="170" font-size="10" fill="#10b981" font-family="Inter, sans-serif">Dados sincronizados</text>
+    </g>
+  </g>
+
+  <!-- Mapa -->
+  <rect x="20" y="195" width="465" height="235" rx="12" fill="url(#cardGradient)" filter="url(#shadow)"/>
+  <text x="40" y="220" font-size="14" font-weight="600" fill="#0f172a" font-family="Inter, sans-serif">📍 Mapa de Entregas</text>
+
+  <!-- Mapa simplificado do Brasil -->
+  <ellipse cx="250" cy="330" rx="180" ry="100" fill="#e2e8f0" opacity="0.5"/>
+
+  <!-- Pontos de entrega animados -->
+  <g id="deliveryPoints">
+    <circle cx="180" cy="300" r="6" fill="#2563eb">
+      <animate attributeName="r" values="6;8;6" dur="1.5s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.5;1" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="280" cy="320" r="6" fill="#10b981">
+      <animate attributeName="r" values="6;8;6" dur="1.8s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.5;1" dur="1.8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="240" cy="350" r="6" fill="#f59e0b">
+      <animate attributeName="r" values="6;8;6" dur="2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="320" cy="290" r="6" fill="#2563eb">
+      <animate attributeName="r" values="6;8;6" dur="1.7s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.5;1" dur="1.7s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="200" cy="340" r="6" fill="#ef4444">
+      <animate attributeName="r" values="6;8;6" dur="2.2s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="1;0.5;1" dur="2.2s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Gráficos laterais -->
+  <g id="sideCharts">
+    <!-- Barra -->
+    <rect x="500" y="195" width="280" height="110" rx="12" fill="url(#cardGradient)" filter="url(#shadow)"/>
+    <text x="515" y="220" font-size="14" font-weight="600" fill="#0f172a" font-family="Inter, sans-serif">📊 Entregas por Cidade</text>
+
+    <!-- Barras animadas -->
+    <g id="barChart">
+      <rect x="525" y="290" width="30" height="0" fill="#2563eb">
+        <animate attributeName="height" values="0;60;0" dur="3s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="290;230;290" dur="3s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="565" y="290" width="30" height="0" fill="#06b6d4">
+        <animate attributeName="height" values="0;45;0" dur="3s" begin="0.2s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="290;245;290" dur="3s" begin="0.2s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="605" y="290" width="30" height="0" fill="#10b981">
+        <animate attributeName="height" values="0;70;0" dur="3s" begin="0.4s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="290;220;290" dur="3s" begin="0.4s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="645" y="290" width="30" height="0" fill="#f59e0b">
+        <animate attributeName="height" values="0;35;0" dur="3s" begin="0.6s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="290;255;290" dur="3s" begin="0.6s" repeatCount="indefinite"/>
+      </rect>
+      <rect x="685" y="290" width="30" height="0" fill="#8b5cf6">
+        <animate attributeName="height" values="0;50;0" dur="3s" begin="0.8s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="290;240;290" dur="3s" begin="0.8s" repeatCount="indefinite"/>
+      </rect>
+    </g>
+
+    <!-- Pizza -->
+    <rect x="500" y="315" width="280" height="115" rx="12" fill="url(#cardGradient)" filter="url(#shadow)"/>
+    <text x="515" y="340" font-size="14" font-weight="600" fill="#0f172a" font-family="Inter, sans-serif">🥧 Status das Entregas</text>
+
+    <!-- Gráfico de pizza animado -->
+    <g id="pieChart" transform="translate(640, 380)">
+      <path d="M 0,-40 A 40,40 0 1,1 -34.64,-20 L 0,0 Z" fill="#10b981">
+        <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="20s" repeatCount="indefinite"/>
+      </path>
+      <path d="M -34.64,-20 A 40,40 0 1,1 34.64,-20 L 0,0 Z" fill="#2563eb" opacity="0.8">
+        <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="20s" repeatCount="indefinite"/>
+      </path>
+      <path d="M 34.64,-20 A 40,40 0 0,0 0,-40 L 0,0 Z" fill="#f59e0b" opacity="0.6">
+        <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="20s" repeatCount="indefinite"/>
+      </path>
+    </g>
+  </g>
+
+  <!-- Indicador de loading -->
+  <g id="loadingIndicator" transform="translate(750, 420)" opacity="0.6">
+    <circle cx="0" cy="0" r="8" stroke="#e2e8f0" stroke-width="3" fill="none"/>
+    <circle cx="0" cy="0" r="8" stroke="#2563eb" stroke-width="3" fill="none" stroke-dasharray="40" stroke-dashoffset="10">
+      <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="1s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+</svg>

@@ -1,0 +1,117 @@
+<svg width="600" height="400" viewBox="0 0 600 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="darkBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e293b;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="darkCard" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#334155;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="darkPrimary" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+    <filter id="darkShadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Dark Mode Background -->
+  <rect width="600" height="400" fill="url(#darkBg)"/>
+
+  <!-- Header Dark -->
+  <rect x="15" y="15" width="570" height="50" rx="10" fill="url(#darkCard)" filter="url(#darkShadow)"/>
+  <text x="35" y="45" font-size="16" font-weight="700" fill="#3b82f6" font-family="Inter, sans-serif">🌙 Dark Mode</text>
+
+  <!-- KPIs Dark -->
+  <g>
+    <rect x="15" y="80" width="130" height="70" rx="10" fill="url(#darkCard)" filter="url(#darkShadow)"/>
+    <text x="25" y="100" font-size="10" fill="#94a3b8" font-family="Inter, sans-serif">Total</text>
+    <text x="25" y="125" font-size="22" font-weight="700" fill="#3b82f6" font-family="Inter, sans-serif">12.4K</text>
+
+    <rect x="160" y="80" width="130" height="70" rx="10" fill="url(#darkCard)" filter="url(#darkShadow)"/>
+    <text x="170" y="100" font-size="10" fill="#94a3b8" font-family="Inter, sans-serif">Sucesso</text>
+    <text x="170" y="125" font-size="22" font-weight="700" fill="#10b981" font-family="Inter, sans-serif">87.3%</text>
+
+    <rect x="305" y="80" width="130" height="70" rx="10" fill="url(#darkCard)" filter="url(#darkShadow)"/>
+    <text x="315" y="100" font-size="10" fill="#94a3b8" font-family="Inter, sans-serif">Pendentes</text>
+    <text x="315" y="125" font-size="22" font-weight="700" fill="#f59e0b" font-family="Inter, sans-serif">1.5K</text>
+
+    <rect x="450" y="80" width="135" height="70" rx="10" fill="url(#darkCard)" filter="url(#darkShadow)"/>
+    <text x="460" y="100" font-size="10" fill="#94a3b8" font-family="Inter, sans-serif">Atualizado</text>
+    <circle cx="470" cy="135" r="4" fill="#10b981">
+      <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite"/>
+    </circle>
+    <text x="478" y="140" font-size="9" fill="#10b981" font-family="Inter, sans-serif">Online</text>
+  </g>
+
+  <!-- Gráfico de Linha Animado -->
+  <rect x="15" y="165" width="365" height="145" rx="10" fill="url(#darkCard)" filter="url(#darkShadow)"/>
+  <text x="30" y="190" font-size="13" font-weight="600" fill="#f1f5f9" font-family="Inter, sans-serif">📈 Tendência de Entregas</text>
+
+  <!-- Linha do gráfico -->
+  <polyline points="40,280 80,260 120,270 160,230 200,240 240,200 280,220 320,180 360,200"
+            fill="none" stroke="url(#darkPrimary)" stroke-width="3">
+    <animate attributeName="stroke-dasharray" values="0,1000;1000,0" dur="2s" fill="freeze"/>
+  </polyline>
+
+  <!-- Área gradiente -->
+  <path d="M 40,280 L 40,260 L 80,260 L 120,270 L 160,230 L 200,240 L 240,200 L 280,220 L 320,180 L 360,200 L 360,280 Z"
+        fill="url(#darkPrimary)" opacity="0.1">
+    <animate attributeName="opacity" values="0.1;0.2;0.1" dur="3s" repeatCount="indefinite"/>
+  </path>
+
+  <!-- Pontos animados -->
+  <circle cx="40" cy="280" r="5" fill="#3b82f6">
+    <animate attributeName="r" values="5;7;5" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="160" cy="230" r="5" fill="#3b82f6">
+    <animate attributeName="r" values="5;7;5" dur="2s" begin="0.3s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="240" cy="200" r="5" fill="#3b82f6">
+    <animate attributeName="r" values="5;7;5" dur="2s" begin="0.6s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="320" cy="180" r="5" fill="#3b82f6">
+    <animate attributeName="r" values="5;7;5" dur="2s" begin="0.9s" repeatCount="indefinite"/>
+  </circle>
+
+  <!-- Barra Lateral -->
+  <rect x="395" y="165" width="190" height="145" rx="10" fill="url(#darkCard)" filter="url(#darkShadow)"/>
+  <text x="410" y="190" font-size="13" font-weight="600" fill="#f1f5f9" font-family="Inter, sans-serif">Top Hubs</text>
+
+  <!-- Rankings animados -->
+  <g font-family="Inter, sans-serif" font-size="11">
+    <text x="410" y="215" fill="#cbd5e1">1️⃣ SP Centro</text>
+    <text x="520" y="215" fill="#10b981">4.2K</text>
+    <rect x="410" y="220" width="0" height="4" fill="#10b981" rx="2">
+      <animate attributeName="width" values="0;100;0" dur="4s" repeatCount="indefinite"/>
+    </rect>
+
+    <text x="410" y="245" fill="#cbd5e1">2️⃣ RJ Centro</text>
+    <text x="520" y="245" fill="#3b82f6">3.8K</text>
+    <rect x="410" y="250" width="0" height="4" fill="#3b82f6" rx="2">
+      <animate attributeName="width" values="0;90;0" dur="4s" begin="0.5s" repeatCount="indefinite"/>
+    </rect>
+
+    <text x="410" y="275" fill="#cbd5e1">3️⃣ BH Centro</text>
+    <text x="520" y="275" fill="#f59e0b">2.9K</text>
+    <rect x="410" y="280" width="0" height="4" fill="#f59e0b" rx="2">
+      <animate attributeName="width" values="0;75;0" dur="4s" begin="1s" repeatCount="indefinite"/>
+    </rect>
+
+    <text x="410" y="305" fill="#cbd5e1">4️⃣ SP Z.Sul</text>
+    <text x="520" y="305" fill="#8b5cf6">2.1K</text>
+    <rect x="410" y="310" width="0" height="4" fill="#8b5cf6" rx="2">
+      <animate attributeName="width" values="0;60;0" dur="4s" begin="1.5s" repeatCount="indefinite"/>
+    </rect>
+  </g>
+
+  <!-- Badge "Novo" pulsante -->
+  <g transform="translate(540, 40)">
+    <rect x="0" y="0" width="40" height="18" rx="4" fill="#ec4899">
+      <animate attributeName="opacity" values="1;0.7;1" dur="1s" repeatCount="indefinite"/>
+    </rect>
+    <text x="20" y="13" font-size="9" fill="white" text-anchor="middle" font-weight="600" font-family="Inter, sans-serif">NOVO</text>
+  </g>
+</svg>

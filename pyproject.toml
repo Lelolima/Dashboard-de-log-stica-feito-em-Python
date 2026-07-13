@@ -1,0 +1,77 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dashboard-logistica-loggi"
+version = "2.0.0"
+description = "Dashboard enterprise de logística com análise de dados da Loggi"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [
+    { name = "Wellington", email = "wellington@example.com" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Framework :: Dash",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "dash>=2.18.0",
+    "dash-bootstrap-components>=1.6.0",
+    "plotly>=5.22.0",
+    "pandas>=2.2.0",
+    "numpy>=2.0.0",
+    "requests>=2.32.0",
+    "pydantic>=2.8.0",
+    "pydantic-settings>=2.4.0",
+    "diskcache>=5.6.0",
+    "flask-caching>=2.3.0",
+    "structlog>=24.4.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.6.0",
+    "black>=24.8.0",
+    "gunicorn>=23.0.0",
+]
+
+[project.scripts]
+dashboard = "src.app:main"
+
+[project.urls]
+Repository = "https://github.com/Lelolima/dashboard-logistica-loggi"
+Issues = "https://github.com/Lelolima/dashboard-logistica-loggi/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+select = ["E", "F", "I", "N", "W", "B", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/*" = ["S101"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --cov=src --cov-report=html --cov-report=term-missing"
