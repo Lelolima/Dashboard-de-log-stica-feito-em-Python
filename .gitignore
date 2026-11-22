@@ -56,3 +56,7 @@ htmlcov/
 
 # Deployment
 webpack-stats.json
+htmlcov/
+.coverage
+coverage.xml
+.cache/

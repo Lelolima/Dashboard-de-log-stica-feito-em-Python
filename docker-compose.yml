@@ -5,7 +5,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: production
     container_name: dashboard-logistica
     ports:
       - "8050:8050"
@@ -14,9 +13,9 @@ services:
       - DASH_HOST=0.0.0.0
       - DASH_PORT=8050
       - DASH_DEBUG=false
-      - MAPBOX_TOKEN=${MAPBOX_TOKEN:-}
-      - REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
-      - LOG_LEVEL=INFO
+      - DASH_MAPBOX_TOKEN=${DASH_MAPBOX_TOKEN:-}
+      - DASH_REDIS_URL=${DASH_REDIS_URL:-redis://redis:6379/0}
+      - DASH_LOG_LEVEL=INFO
     volumes:
       - ./data:/app/data:ro
       - ./assets:/app/assets:ro

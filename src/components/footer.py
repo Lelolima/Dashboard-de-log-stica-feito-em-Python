@@ -2,9 +2,10 @@
 Componente de Footer para o Dashboard.
 """
 
+from datetime import datetime
+
 import dash_bootstrap_components as dbc
 from dash import html
-from datetime import datetime
 
 from src import __version__
 

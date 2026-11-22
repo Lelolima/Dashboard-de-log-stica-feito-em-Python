@@ -4,20 +4,22 @@ Callbacks do Dashboard.
 Todos os callbacks para interatividade do dashboard.
 """
 
-from typing import Any, Dict, List, Optional, Tuple
+from io import StringIO
+from typing import Any
+
 import pandas as pd
 import plotly.graph_objects as go
-from dash import html, dcc, Output, Input, State, ctx, callback
+from dash import Input, Output, State, callback, dcc, html
 
+from src.components.metrics_cards import render_metrics_cards
 from src.data.loader import DataLoader
 from src.data.processor import DataProcessor
+from src.utils.logger import get_logger
 from src.visualizations import (
-    create_map_chart,
     create_bar_chart,
+    create_map_chart,
     create_pie_chart,
 )
-from src.components.metrics_cards import render_metrics_cards
-from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -26,13 +28,14 @@ logger = get_logger(__name__)
 # Callbacks do Header
 # ============================================
 
+
 @callback(
     Output("body", "data-bs-theme"),
     Input("btn-toggle-theme", "n_clicks"),
     State("body", "data-bs-theme"),
     prevent_initial_call=True,
 )
-def toggle_theme(n_clicks: Optional[int], current_theme: str) -> str:
+def toggle_theme(n_clicks: int | None, current_theme: str) -> str:
     """Alterna entre tema claro e escuro."""
     return "dark" if current_theme == "light" else "light"
 
@@ -43,7 +46,7 @@ def toggle_theme(n_clicks: Optional[int], current_theme: str) -> str:
     State("body", "data-bs-theme"),
     prevent_initial_call=True,
 )
-def update_theme_icon(n_clicks: Optional[int], current_theme: str) -> str:
+def update_theme_icon(n_clicks: int | None, current_theme: str) -> str:
     """Atualiza o ícone do botão de tema."""
     # O tema ainda não mudou quando este callback é executado
     # Então mostramos o ícone oposto ao atual
@@ -59,14 +62,14 @@ def update_theme_icon(n_clicks: Optional[int], current_theme: str) -> str:
     prevent_initial_call=True,
 )
 def download_data(
-    n_clicks: Optional[int],
-    store_data: Optional[Dict[str, Any]],
+    n_clicks: int | None,
+    store_data: dict[str, Any] | None,
 ):
     """Gera arquivo CSV para download."""
     if not store_data or "df_json" not in store_data:
         return None
 
-    df = pd.read_json(store_data["df_json"])
+    df = pd.read_json(StringIO(store_data["df_json"]))
     csv_bytes = df.to_csv(index=False).encode("utf-8")
 
     return dcc.send_bytes(csv_bytes, filename="dashboard_export.csv")
@@ -75,6 +78,7 @@ def download_data(
 # ============================================
 # Callbacks Principais de Atualização (em tempo real)
 # ============================================
+
 
 @callback(
     [
@@ -94,12 +98,12 @@ def download_data(
     State("store-data", "data"),
 )
 def update_dashboard(
-    states: Optional[List[str]] = None,
-    cities: Optional[List[str]] = None,
-    hubs: Optional[List[str]] = None,
-    statuses: Optional[List[str]] = None,
-    store_data: Optional[Dict[str, Any]] = None,
-) -> Tuple[go.Figure, go.Figure, go.Figure, go.Figure, go.Figure, html.Div]:
+    states: list[str] | None = None,
+    cities: list[str] | None = None,
+    hubs: list[str] | None = None,
+    statuses: list[str] | None = None,
+    store_data: dict[str, Any] | None = None,
+) -> tuple[go.Figure, go.Figure, go.Figure, go.Figure, go.Figure, html.Div]:
     """
     Atualiza todos os gráficos e métricas do dashboard em tempo real.
 
@@ -107,7 +111,7 @@ def update_dashboard(
     """
     # Carregar dados
     if store_data and "df_json" in store_data:
-        df = pd.read_json(store_data["df_json"])
+        df = pd.read_json(StringIO(store_data["df_json"]))
     else:
         loader = DataLoader()
         df = loader.load_deliveries()
@@ -115,15 +119,13 @@ def update_dashboard(
     # Aplicar filtros
     processor = DataProcessor(df)
 
-    # Filtrar por estado (se selecionado)
-    if states and len(states) > 0 and states != ["Todos"]:
-        df_filtered = processor.filtrar_por_regiao(estado=states[0]).df
-        processor = DataProcessor(df_filtered)
+    # Filtrar por estado/cidade: considera TODOS os valores marcados no checklist
+    # (antes só o primeiro item era usado, escondendo os demais estados/cidades).
+    if states and states != ["Todos"] and "state" in df.columns:
+        processor = DataProcessor(processor.df[processor.df["state"].isin(states)])
 
-    # Filtrar por cidade (se selecionado)
-    if cities and len(cities) > 0:
-        df_filtered = processor.filtrar_por_regiao(cidade=cities[0]).df
-        processor = DataProcessor(df_filtered)
+    if cities and "city" in df.columns:
+        processor = DataProcessor(processor.df[processor.df["city"].isin(cities)])
 
     # Filtrar por hub (se selecionado)
     if hubs and len(hubs) > 0:
@@ -147,11 +149,10 @@ def update_dashboard(
     pie_status_fig = create_pie_chart(df_filtered, group_by="status", height=350)
 
     # Gráfico de hubs
-    loader = DataLoader()
-    hubs_df = loader.load_hubs()
-
     if len(df_filtered) > 0 and "hub_id" in df_filtered.columns:
-        hub_capacity_fig = create_bar_chart(df_filtered, group_by="hub_id", metric="total", height=350)
+        hub_capacity_fig = create_bar_chart(
+            df_filtered, group_by="hub_id", metric="total", height=350
+        )
     else:
         hub_capacity_fig = go.Figure()
 
@@ -172,6 +173,7 @@ def update_dashboard(
 # Callback para Resetar Filtros
 # ============================================
 
+
 @callback(
     [
         Output("filter-state", "value"),
@@ -184,9 +186,9 @@ def update_dashboard(
     prevent_initial_call=True,
 )
 def clear_filters(
-    n_clicks: Optional[int],
-    store_options: Optional[Dict[str, Any]],
-) -> Tuple[List[str], List[str], List[str], List[str]]:
+    n_clicks: int | None,
+    store_options: dict[str, Any] | None,
+) -> tuple[list[str], list[str], list[str], list[str]]:
     """Reseta todos os filtros para valores padrão."""
     if not store_options:
         return [], [], [], ["delivered", "in_transit", "pending"]
@@ -204,11 +206,12 @@ def clear_filters(
 # Callback para Feedback Visual dos Botões
 # ============================================
 
+
 @callback(
     Output("btn-clear-filters", "color"),
     Input("btn-clear-filters", "n_clicks"),
     prevent_initial_call=True,
 )
-def clear_feedback(n_clicks: Optional[int]) -> str:
+def clear_feedback(n_clicks: int | None) -> str:
     """Feedback visual ao limpar filtros."""
     return "success"

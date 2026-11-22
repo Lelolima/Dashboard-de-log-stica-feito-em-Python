@@ -4,14 +4,15 @@ Relatório Executivo para Dashboard de Logística.
 Gera relatório profissional com insights automáticos e análise detalhada.
 """
 
-from typing import Dict, Any, List, Optional
-import pandas as pd
 from datetime import datetime
+from typing import Any
+
 import dash_bootstrap_components as dbc
+import pandas as pd
 from dash import html
 
 
-def render_executive_report(df: pd.DataFrame, metrics: Dict[str, Any]) -> html.Div:
+def render_executive_report(df: pd.DataFrame, metrics: dict[str, Any]) -> html.Div:
     """
     Renderiza página de relatório executivo.
 
@@ -74,9 +75,11 @@ def render_executive_report(df: pd.DataFrame, metrics: Dict[str, Any]) -> html.D
                     ]
                 ),
                 className="border-0 shadow-sm mb-4",
-                style={"borderRadius": "12px", "background": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"},
+                style={
+                    "borderRadius": "12px",
+                    "background": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                },
             ),
-
             # Seção 1: Resumo Executivo
             dbc.Card(
                 [
@@ -92,14 +95,33 @@ def render_executive_report(df: pd.DataFrame, metrics: Dict[str, Any]) -> html.D
                             # KPIs em Cards
                             dbc.Row(
                                 [
-                                    create_kpi_card("Total de Entregas", f"{metrics.get('total_entregas', 0):,}", "📦", "blue"),
-                                    create_kpi_card("Taxa de Sucesso", f"{metrics.get('taxa_sucesso', 0):.1f}%", "✅", "green"),
-                                    create_kpi_card("Entregues", f"{metrics.get('entregas_entregues', 0):,}", "🎯", "emerald"),
-                                    create_kpi_card("Pendentes", f"{metrics.get('entregas_pendentes', 0) + metrics.get('entregas_em_transito', 0):,}", "⏳", "amber"),
+                                    create_kpi_card(
+                                        "Total de Entregas",
+                                        f"{metrics.get('total_entregas', 0):,}",
+                                        "📦",
+                                        "blue",
+                                    ),
+                                    create_kpi_card(
+                                        "Taxa de Sucesso",
+                                        f"{metrics.get('taxa_sucesso', 0):.1f}%",
+                                        "✅",
+                                        "green",
+                                    ),
+                                    create_kpi_card(
+                                        "Entregues",
+                                        f"{metrics.get('entregas_entregues', 0):,}",
+                                        "🎯",
+                                        "emerald",
+                                    ),
+                                    create_kpi_card(
+                                        "Pendentes",
+                                        f"{metrics.get('entregas_pendentes', 0) + metrics.get('entregas_em_transito', 0):,}",
+                                        "⏳",
+                                        "amber",
+                                    ),
                                 ],
                                 className="mb-4",
                             ),
-
                             # Insights Automáticos
                             html.H5("🔍 Insights Automáticos", className="fw-semibold mb-3"),
                             dbc.Alert(
@@ -132,7 +154,6 @@ def render_executive_report(df: pd.DataFrame, metrics: Dict[str, Any]) -> html.D
                 className="border-0 shadow-sm mb-4",
                 style={"borderRadius": "12px"},
             ),
-
             # Seção 2: Performance por Hub
             dbc.Card(
                 [
@@ -163,7 +184,11 @@ def render_executive_report(df: pd.DataFrame, metrics: Dict[str, Any]) -> html.D
                                         [
                                             html.Tr(
                                                 [
-                                                    html.Td(hub.get("hub_name", hub.get("hub_id", "N/A"))),
+                                                    html.Td(
+                                                        hub.get(
+                                                            "hub_name", hub.get("hub_id", "N/A")
+                                                        )
+                                                    ),
                                                     html.Td(f"{hub.get('total_entregas', 0):,}"),
                                                     html.Td(f"{hub.get('entregues', 0):,}"),
                                                     html.Td(
@@ -172,7 +197,9 @@ def render_executive_report(df: pd.DataFrame, metrics: Dict[str, Any]) -> html.D
                                                             className=f"badge bg-{get_badge_color(hub.get('taxa_sucesso', 0))}",
                                                         )
                                                     ),
-                                                    html.Td(get_status_icon(hub.get("taxa_sucesso", 0))),
+                                                    html.Td(
+                                                        get_status_icon(hub.get("taxa_sucesso", 0))
+                                                    ),
                                                 ]
                                             )
                                             for hub in hub_performance
@@ -189,7 +216,6 @@ def render_executive_report(df: pd.DataFrame, metrics: Dict[str, Any]) -> html.D
                 className="border-0 shadow-sm mb-4",
                 style={"borderRadius": "12px"},
             ),
-
             # Seção 3: Ranking de Cidades
             dbc.Card(
                 [
@@ -226,7 +252,6 @@ def render_executive_report(df: pd.DataFrame, metrics: Dict[str, Any]) -> html.D
                 className="border-0 shadow-sm mb-4",
                 style={"borderRadius": "12px"},
             ),
-
             # Seção 4: Recomendações
             dbc.Card(
                 [
@@ -243,21 +268,27 @@ def render_executive_report(df: pd.DataFrame, metrics: Dict[str, Any]) -> html.D
                                 [
                                     dbc.ListGroupItem(
                                         [
-                                            html.I(className="bi bi-check-circle-fill text-success me-2"),
+                                            html.I(
+                                                className="bi bi-check-circle-fill text-success me-2"
+                                            ),
                                             "Manter foco nos hubs com alta taxa de sucesso para replicar melhores práticas.",
                                         ],
                                         className="border-0",
                                     ),
                                     dbc.ListGroupItem(
                                         [
-                                            html.I(className="bi bi-exclamation-circle-fill text-warning me-2"),
+                                            html.I(
+                                                className="bi bi-exclamation-circle-fill text-warning me-2"
+                                            ),
                                             "Investigar causas de cancelamentos nos hubs com taxa abaixo de 80%.",
                                         ],
                                         className="border-0",
                                     ),
                                     dbc.ListGroupItem(
                                         [
-                                            html.I(className="bi bi-arrow-right-circle-fill text-primary me-2"),
+                                            html.I(
+                                                className="bi bi-arrow-right-circle-fill text-primary me-2"
+                                            ),
                                             "Otimizar rotas das cidades com maior volume para reduzir tempo de entrega.",
                                         ],
                                         className="border-0",
@@ -278,7 +309,7 @@ def render_executive_report(df: pd.DataFrame, metrics: Dict[str, Any]) -> html.D
     return report
 
 
-def generate_insights(df: pd.DataFrame, metrics: Dict[str, Any]) -> Dict[str, str]:
+def generate_insights(df: pd.DataFrame, metrics: dict[str, Any]) -> dict[str, str]:  # noqa: ARG001
     """
     Gera insights automáticos baseados nos dados.
 
@@ -305,7 +336,9 @@ def generate_insights(df: pd.DataFrame, metrics: Dict[str, Any]) -> Dict[str, st
     if performance_ratio >= 0.8:
         performance_insight += "Operação está fluindo normalmente."
     else:
-        performance_insight += f"Ainda há {pending + in_transit} entregas em andamento para concluir."
+        performance_insight += (
+            f"Ainda há {pending + in_transit} entregas em andamento para concluir."
+        )
 
     # Insight de atenção
     cancelled = metrics.get("entregas_canceladas", 0)
@@ -324,27 +357,35 @@ def generate_insights(df: pd.DataFrame, metrics: Dict[str, Any]) -> Dict[str, st
     }
 
 
-def generate_hub_performance(df: pd.DataFrame) -> List[Dict[str, Any]]:
+def generate_hub_performance(df: pd.DataFrame) -> list[dict[str, Any]]:
     """
     Gera tabela de performance por hub.
     """
     if df.empty or "hub_id" not in df.columns:
         return []
 
-    hub_stats = df.groupby("hub_id").agg({
-        "id": "count",
-        "status": lambda x: (x == "delivered").sum(),
-        "hub_name": "first" if "hub_name" in df.columns else lambda x: x.iloc[0],
-    }).reset_index()
+    hub_stats = (
+        df.groupby("hub_id")
+        .agg(
+            {
+                "id": "count",
+                "status": lambda x: (x == "delivered").sum(),
+                "hub_name": "first" if "hub_name" in df.columns else lambda x: x.iloc[0],
+            }
+        )
+        .reset_index()
+    )
 
     hub_stats.columns = ["hub_id", "total_entregas", "entregues", "hub_name"]
-    hub_stats["taxa_sucesso"] = (hub_stats["entregues"] / hub_stats["total_entregas"] * 100).round(1)
+    hub_stats["taxa_sucesso"] = (hub_stats["entregues"] / hub_stats["total_entregas"] * 100).round(
+        1
+    )
     hub_stats = hub_stats.sort_values("taxa_sucesso", ascending=False)
 
     return hub_stats.to_dict("records")
 
 
-def generate_city_ranking(df: pd.DataFrame) -> List[Dict[str, Any]]:
+def generate_city_ranking(df: pd.DataFrame) -> list[dict[str, Any]]:
     """
     Gera ranking de cidades por volume.
     """
@@ -379,7 +420,10 @@ def create_kpi_card(title: str, value: str, icon: str, color: str) -> dbc.Col:
                             html.Span(
                                 value,
                                 className="d-block fw-bold",
-                                style={"fontSize": "1.75rem", "color": color_map.get(color, "#3b82f6")},
+                                style={
+                                    "fontSize": "1.75rem",
+                                    "color": color_map.get(color, "#3b82f6"),
+                                },
                             ),
                             html.Small(title, className="text-muted"),
                         ],
@@ -389,14 +433,17 @@ def create_kpi_card(title: str, value: str, icon: str, color: str) -> dbc.Col:
                 className="py-3",
             ),
             className="border-0 h-100",
-            style={"borderRadius": "12px", "backgroundColor": f"{color_map.get(color, '#3b82f6')}10"},
+            style={
+                "borderRadius": "12px",
+                "backgroundColor": f"{color_map.get(color, '#3b82f6')}10",
+            },
         ),
         md=3,
         className="mb-3",
     )
 
 
-def create_city_rank_card(city: Dict[str, Any], rank: int) -> dbc.Card:
+def create_city_rank_card(city: dict[str, Any], rank: int) -> dbc.Card:
     """
     Cria card de ranking de cidade.
     """

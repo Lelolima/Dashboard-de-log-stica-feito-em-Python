@@ -4,28 +4,24 @@ Dashboard Logística Loggi - App Principal v2.0 BI Enterprise.
 Aplicação Dash enterprise para análise de dados de logística.
 """
 
-from datetime import datetime
-from typing import Optional
-
 import dash
 import dash_bootstrap_components as dbc
-import pandas as pd
 from dash import dcc, html
 
+from src.components.footer import render_footer
+from src.components.header import render_header
+from src.components.metrics_cards import render_metrics_cards
+from src.components.sidebar import render_sidebar
 from src.config import settings
 from src.data.loader import DataLoader
 from src.data.processor import DataProcessor
-from src.visualizations import create_map_chart, create_bar_chart, create_pie_chart
-from src.components.header import render_header
-from src.components.sidebar import render_sidebar
-from src.components.metrics_cards import render_metrics_cards
-from src.components.footer import render_footer
 from src.utils.logger import get_logger, setup_logging
+from src.visualizations import create_bar_chart, create_map_chart, create_pie_chart
 
 logger = get_logger(__name__)
 
 
-def create_app(testing: bool = False) -> dash.Dash:
+def create_app(testing: bool = False) -> dash.Dash:  # noqa: ARG001 (contrato público)
     """
     Cria e configura a aplicação Dash.
     """
@@ -50,7 +46,6 @@ def create_app(testing: bool = False) -> dash.Dash:
         title="Dashboard Logística Loggi",
     )
     app.title = "📊 Dashboard Logística Loggi"
-    server = app.server
 
     # Carregar dados iniciais
     logger.info("Carregando dados iniciais")
@@ -71,11 +66,9 @@ def create_app(testing: bool = False) -> dash.Dash:
     logger.info("Criando gráficos enterprise")
     initial_map = create_map_chart(processor.get_dados_mapa(), mapbox_token=settings.mapbox_token)
     initial_bar_city = create_bar_chart(df, group_by="city", height=350)
-    initial_bar_status = create_bar_chart(df, group_by="status", height=350)
     initial_pie_status = create_pie_chart(df, group_by="status", height=350)
 
     # Gráfico de hubs
-    hubs_df = loader.load_hubs()
     if len(df) > 0 and "hub_id" in df.columns:
         initial_hub_capacity = create_bar_chart(df, group_by="hub_id", height=350)
     else:
@@ -91,18 +84,32 @@ def create_app(testing: bool = False) -> dash.Dash:
                 data={
                     "cities": cities,
                     "states": states,
-                    "hubs": [{"id": h.get("id", ""), "hub_name": h.get("hub_name", "")} for h in hubs],
+                    "hubs": [
+                        {"id": h.get("id", ""), "hub_name": h.get("hub_name", "")} for h in hubs
+                    ],
                     "statuses": statuses,
                 },
             ),
             dcc.Location(id="url", refresh=False),
             dcc.Download(id="download-data"),
-
             # Corpo do Dashboard
             html.Div(
                 id="body",
                 children=[
                     render_header(),
+                    *(
+                        [
+                            dbc.Alert(
+                                "Dados de exemplo gerados automaticamente (simulados): "
+                                "não representam operações reais.",
+                                id="sample-data-alert",
+                                color="warning",
+                                className="m-3 mb-0",
+                            )
+                        ]
+                        if loader.using_sample_data
+                        else []
+                    ),
                     dbc.Container(
                         [
                             # Cards de métricas
@@ -130,7 +137,15 @@ def create_app(testing: bool = False) -> dash.Dash:
                                         [
                                             # Mapa
                                             dbc.Card(
-                                                dbc.CardBody([dcc.Graph(id="map-chart", figure=initial_map, config={"responsive": True})]),
+                                                dbc.CardBody(
+                                                    [
+                                                        dcc.Graph(
+                                                            id="map-chart",
+                                                            figure=initial_map,
+                                                            config={"responsive": True},
+                                                        )
+                                                    ]
+                                                ),
                                                 className="mb-3 border-0 shadow-sm",
                                                 style={"borderRadius": "12px"},
                                             ),
@@ -140,7 +155,13 @@ def create_app(testing: bool = False) -> dash.Dash:
                                                     dbc.Col(
                                                         dbc.Card(
                                                             dbc.CardBody(
-                                                                [dcc.Graph(id="bar-chart-city", figure=initial_bar_city, config={"responsive": True})]
+                                                                [
+                                                                    dcc.Graph(
+                                                                        id="bar-chart-city",
+                                                                        figure=initial_bar_city,
+                                                                        config={"responsive": True},
+                                                                    )
+                                                                ]
                                                             ),
                                                             className="border-0 shadow-sm",
                                                             style={"borderRadius": "12px"},
@@ -150,7 +171,13 @@ def create_app(testing: bool = False) -> dash.Dash:
                                                     dbc.Col(
                                                         dbc.Card(
                                                             dbc.CardBody(
-                                                                [dcc.Graph(id="pie-chart-status", figure=initial_pie_status, config={"responsive": True})]
+                                                                [
+                                                                    dcc.Graph(
+                                                                        id="pie-chart-status",
+                                                                        figure=initial_pie_status,
+                                                                        config={"responsive": True},
+                                                                    )
+                                                                ]
                                                             ),
                                                             className="border-0 shadow-sm",
                                                             style={"borderRadius": "12px"},
@@ -163,7 +190,13 @@ def create_app(testing: bool = False) -> dash.Dash:
                                             # Capacidade por hub
                                             dbc.Card(
                                                 dbc.CardBody(
-                                                    [dcc.Graph(id="hub-capacity-chart", figure=initial_hub_capacity, config={"responsive": True})]
+                                                    [
+                                                        dcc.Graph(
+                                                            id="hub-capacity-chart",
+                                                            figure=initial_hub_capacity,
+                                                            config={"responsive": True},
+                                                        )
+                                                    ]
                                                 ),
                                                 className="border-0 shadow-sm",
                                                 style={"borderRadius": "12px"},
@@ -194,13 +227,6 @@ def create_app(testing: bool = False) -> dash.Dash:
 
     # Registrar callbacks após layout
     logger.info("Registrando callbacks")
-    from src.callbacks import (
-        toggle_theme,
-        update_theme_icon,
-        download_data,
-        update_dashboard,
-        clear_filters,
-    )
 
     logger.info("Aplicação BI Enterprise criada com sucesso")
     return app

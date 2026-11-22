@@ -4,9 +4,14 @@ Validação de dados com Pydantic.
 Define schemas para validação de dados de entregas e hubs.
 """
 
-from typing import Optional, List, Dict, Any
 from datetime import datetime
-from pydantic import BaseModel, Field, field_validator, EmailStr
+from typing import Any
+
+from pydantic import BaseModel, Field, field_validator
+
+from src.utils.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class DeliverySchema(BaseModel):
@@ -38,10 +43,10 @@ class DeliverySchema(BaseModel):
     state: str = Field(..., min_length=2, max_length=2, description="Estado (UF)")
     status: str = Field(default="pending", description="Status da entrega")
     hub_id: str = Field(..., description="ID do hub")
-    estimated_delivery: Optional[datetime] = Field(default=None, description="Data estimada")
-    actual_delivery: Optional[datetime] = Field(default=None, description="Data real")
-    weight: Optional[float] = Field(default=None, ge=0, le=1000, description="Peso em kg")
-    dimensions: Optional[str] = Field(default=None, description="Dimensões LxAxP")
+    estimated_delivery: datetime | None = Field(default=None, description="Data estimada")
+    actual_delivery: datetime | None = Field(default=None, description="Data real")
+    weight: float | None = Field(default=None, ge=0, le=1000, description="Peso em kg")
+    dimensions: str | None = Field(default=None, description="Dimensões LxAxP")
 
     @field_validator("status")
     @classmethod
@@ -105,7 +110,7 @@ class DeliveryMetrics(BaseModel):
     entregas_entregues: int = Field(default=0, ge=0)
     entregas_canceladas: int = Field(default=0, ge=0)
     taxa_sucesso: float = Field(default=0.0, ge=0, le=100)
-    tempo_medio_entrega: Optional[float] = Field(default=None, ge=0)
+    tempo_medio_entrega: float | None = Field(default=None, ge=0)
     peso_total: float = Field(default=0.0, ge=0)
 
 
@@ -124,7 +129,7 @@ class DataValidator:
         self._hub_schema = HubSchema
         self._metrics_schema = DeliveryMetrics
 
-    def validate_delivery(self, data: Dict[str, Any]) -> DeliverySchema:
+    def validate_delivery(self, data: dict[str, Any]) -> DeliverySchema:
         """
         Valida dados de entrega.
 
@@ -139,7 +144,7 @@ class DataValidator:
         """
         return self._delivery_schema.model_validate(data)
 
-    def validate_hub(self, data: Dict[str, Any]) -> HubSchema:
+    def validate_hub(self, data: dict[str, Any]) -> HubSchema:
         """
         Valida dados de hub.
 
@@ -151,7 +156,7 @@ class DataValidator:
         """
         return self._hub_schema.model_validate(data)
 
-    def validate_metrics(self, data: Dict[str, Any]) -> DeliveryMetrics:
+    def validate_metrics(self, data: dict[str, Any]) -> DeliveryMetrics:
         """
         Valida métricas de entregas.
 
@@ -164,10 +169,8 @@ class DataValidator:
         return self._metrics_schema.model_validate(data)
 
     def validate_dataframe(
-        self,
-        data: List[Dict[str, Any]],
-        schema_type: str = "delivery"
-    ) -> List[Dict[str, Any]]:
+        self, data: list[dict[str, Any]], schema_type: str = "delivery"
+    ) -> list[dict[str, Any]]:
         """
         Valida lista de dados (DataFrame-like).
 
@@ -189,8 +192,8 @@ class DataValidator:
         for item in data:
             try:
                 validated.append(schema.model_validate(item).model_dump())
-            except Exception as e:
-                # Log erro mas continua processando
-                pass
+            except Exception as exc:
+                # Registra o item inválido e continua processando
+                logger.warning("Item inválido descartado na validação", error=str(exc))
 
         return validated

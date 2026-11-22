@@ -2,12 +2,13 @@
 Dashboard Home Page - Versão BI Enterprise.
 """
 
-from typing import Dict, Any, List, Optional
+from typing import Any
+
 import dash_bootstrap_components as dbc
-from dash import html, dcc
+from dash import html
 
 
-def render_dashboard_home(metrics: Dict[str, Any], df_info: Dict[str, Any]) -> html.Div:
+def render_dashboard_home(metrics: dict[str, Any], df_info: dict[str, Any]) -> html.Div:
     """
     Renderiza página home do dashboard.
 
@@ -32,25 +33,28 @@ def render_dashboard_home(metrics: Dict[str, Any], df_info: Dict[str, Any]) -> h
                             ],
                             href="/",
                         ),
-
                         # Navegação
                         dbc.Nav(
                             [
                                 dbc.NavLink("📊 Dashboard", href="/", active="exact"),
-                                dbc.NavLink("📑 Relatório Executivo", href="/report", active="exact"),
+                                dbc.NavLink(
+                                    "📑 Relatório Executivo", href="/report", active="exact"
+                                ),
                                 dbc.NavLink("⚙️ Configurações", href="/settings", active="exact"),
                             ],
                             className="me-auto",
                             navbar=True,
                         ),
-
                         # User Menu
                         dbc.Nav(
                             [
                                 dbc.NavItem(
                                     dbc.Button(
                                         [
-                                            html.I(className="bi bi-moon-stars-fill me-1", id="theme-icon"),
+                                            html.I(
+                                                className="bi bi-moon-stars-fill me-1",
+                                                id="theme-icon",
+                                            ),
                                         ],
                                         id="btn-toggle-theme",
                                         variant="outline-secondary",
@@ -79,7 +83,6 @@ def render_dashboard_home(metrics: Dict[str, Any], df_info: Dict[str, Any]) -> h
                 dark=True,
                 className="mb-4",
             ),
-
             # Stats em Tempo Real
             dbc.Container(
                 [
@@ -93,7 +96,10 @@ def render_dashboard_home(metrics: Dict[str, Any], df_info: Dict[str, Any]) -> h
                                                 [
                                                     dbc.Col(
                                                         [
-                                                            html.Small("📦 Total Entregas", className="text-muted mb-1"),
+                                                            html.Small(
+                                                                "📦 Total Entregas",
+                                                                className="text-muted mb-1",
+                                                            ),
                                                             html.H3(
                                                                 f"{metrics.get('total_entregas', 0):,}",
                                                                 className="mb-0 fw-bold",
@@ -134,11 +140,17 @@ def render_dashboard_home(metrics: Dict[str, Any], df_info: Dict[str, Any]) -> h
                                                 [
                                                     dbc.Col(
                                                         [
-                                                            html.Small("✅ Taxa Sucesso", className="text-muted mb-1"),
+                                                            html.Small(
+                                                                "✅ Taxa Sucesso",
+                                                                className="text-muted mb-1",
+                                                            ),
                                                             html.H3(
                                                                 f"{metrics.get('taxa_sucesso', 0):.1f}%",
                                                                 className="mb-0 fw-bold",
-                                                                style={"fontSize": "2rem", "color": "#10b981"},
+                                                                style={
+                                                                    "fontSize": "2rem",
+                                                                    "color": "#10b981",
+                                                                },
                                                             ),
                                                         ],
                                                         xs=8,
@@ -175,11 +187,17 @@ def render_dashboard_home(metrics: Dict[str, Any], df_info: Dict[str, Any]) -> h
                                                 [
                                                     dbc.Col(
                                                         [
-                                                            html.Small("⏳ Em Andamento", className="text-muted mb-1"),
+                                                            html.Small(
+                                                                "⏳ Em Andamento",
+                                                                className="text-muted mb-1",
+                                                            ),
                                                             html.H3(
                                                                 f"{metrics.get('entregas_pendentes', 0) + metrics.get('entregas_em_transito', 0):,}",
                                                                 className="mb-0 fw-bold",
-                                                                style={"fontSize": "2rem", "color": "#f59e0b"},
+                                                                style={
+                                                                    "fontSize": "2rem",
+                                                                    "color": "#f59e0b",
+                                                                },
                                                             ),
                                                         ],
                                                         xs=8,
@@ -212,7 +230,10 @@ def render_dashboard_home(metrics: Dict[str, Any], df_info: Dict[str, Any]) -> h
                                                 [
                                                     dbc.Col(
                                                         [
-                                                            html.Small("🕐 Última Atualização", className="text-muted mb-1"),
+                                                            html.Small(
+                                                                "🕐 Última Atualização",
+                                                                className="text-muted mb-1",
+                                                            ),
                                                             html.P(
                                                                 df_info.get("last_update", "Agora"),
                                                                 className="mb-0 fw-semibold",
@@ -235,7 +256,10 @@ def render_dashboard_home(metrics: Dict[str, Any], df_info: Dict[str, Any]) -> h
                                                             "display": "inline-block",
                                                         },
                                                     ),
-                                                    html.Small("Dados sincronizados", className="text-muted"),
+                                                    html.Small(
+                                                        "Dados sincronizados",
+                                                        className="text-muted",
+                                                    ),
                                                 ],
                                                 className="mt-2",
                                             ),

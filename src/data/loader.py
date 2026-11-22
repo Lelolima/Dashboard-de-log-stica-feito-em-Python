@@ -8,16 +8,16 @@ Responsável por carregar dados de múltiplas fontes:
 """
 
 import json
-import os
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Union
+from typing import Any
+
 import pandas as pd
 import requests
 
 from src.config import settings
-from src.utils.logger import get_logger
 from src.utils.cache_manager import cache
 from src.utils.data_validator import DataValidator
+from src.utils.logger import get_logger
 
 logger = get_logger(__name__)
 
@@ -36,7 +36,7 @@ class DataLoader:
 
     def __init__(
         self,
-        data_source: Optional[str] = None,
+        data_source: str | None = None,
         cache_enabled: bool = True,
     ):
         """
@@ -50,6 +50,7 @@ class DataLoader:
         self.cache_enabled = cache_enabled
         self.validator = DataValidator()
         self._cache = cache  # Usa instância global diretamente
+        self.using_sample_data = False
 
         logger.info(
             "DataLoader inicializado",
@@ -91,7 +92,7 @@ class DataLoader:
             if file_path.exists():
                 logger.info(f"Carregando arquivo local: {file_path}")
                 try:
-                    with open(file_path, "r", encoding="utf-8") as f:
+                    with open(file_path, encoding="utf-8") as f:
                         data = json.load(f)
 
                     df = pd.DataFrame(data)
@@ -141,17 +142,47 @@ class DataLoader:
         Dícnica de logística urbana com hubs e entregas simuladas.
         """
         logger.info("Gerando dados de exemplo para demonstração")
+        self.using_sample_data = True
 
         # Hubs de distribuição (baseado em cidades reais do Brasil)
         hubs = [
-            {"id": "hub_sp_centro", "name": "São Paulo - Centro", "city": "São Paulo", "state": "SP", "lat": -23.5505, "lng": -46.6333},
-            {"id": "hub_sp_zsul", "name": "São Paulo - Zona Sul", "city": "São Paulo", "state": "SP", "lat": -23.7000, "lng": -46.6800},
-            {"id": "hub_rj_centro", "name": "Rio de Janeiro - Centro", "city": "Rio de Janeiro", "state": "RJ", "lat": -22.9068, "lng": -43.1729},
-            {"id": "hub_mg_centro", "name": "Belo Horizonte - Centro", "city": "Belo Horizonte", "state": "MG", "lat": -19.9167, "lng": -43.9345},
+            {
+                "id": "hub_sp_centro",
+                "name": "São Paulo - Centro",
+                "city": "São Paulo",
+                "state": "SP",
+                "lat": -23.5505,
+                "lng": -46.6333,
+            },
+            {
+                "id": "hub_sp_zsul",
+                "name": "São Paulo - Zona Sul",
+                "city": "São Paulo",
+                "state": "SP",
+                "lat": -23.7000,
+                "lng": -46.6800,
+            },
+            {
+                "id": "hub_rj_centro",
+                "name": "Rio de Janeiro - Centro",
+                "city": "Rio de Janeiro",
+                "state": "RJ",
+                "lat": -22.9068,
+                "lng": -43.1729,
+            },
+            {
+                "id": "hub_mg_centro",
+                "name": "Belo Horizonte - Centro",
+                "city": "Belo Horizonte",
+                "state": "MG",
+                "lat": -19.9167,
+                "lng": -43.9345,
+            },
         ]
 
         # Gerar entregas simuladas
         import random
+
         random.seed(42)  # Reprodutibilidade
 
         deliveries = []
@@ -233,15 +264,47 @@ class DataLoader:
 
         # Dados padrão de hubs
         hubs_data = [
-            {"id": "hub_sp_centro", "name": "São Paulo - Centro", "city": "São Paulo", "state": "SP", "lat": -23.5505, "lng": -46.6333, "capacity": 1000},
-            {"id": "hub_sp_zsul", "name": "São Paulo - Zona Sul", "city": "São Paulo", "state": "SP", "lat": -23.7000, "lng": -46.6800, "capacity": 800},
-            {"id": "hub_rj_centro", "name": "Rio de Janeiro - Centro", "city": "Rio de Janeiro", "state": "RJ", "lat": -22.9068, "lng": -43.1729, "capacity": 600},
-            {"id": "hub_mg_centro", "name": "Belo Horizonte - Centro", "city": "Belo Horizonte", "state": "MG", "lat": -19.9167, "lng": -43.9345, "capacity": 500},
+            {
+                "id": "hub_sp_centro",
+                "name": "São Paulo - Centro",
+                "city": "São Paulo",
+                "state": "SP",
+                "lat": -23.5505,
+                "lng": -46.6333,
+                "capacity": 1000,
+            },
+            {
+                "id": "hub_sp_zsul",
+                "name": "São Paulo - Zona Sul",
+                "city": "São Paulo",
+                "state": "SP",
+                "lat": -23.7000,
+                "lng": -46.6800,
+                "capacity": 800,
+            },
+            {
+                "id": "hub_rj_centro",
+                "name": "Rio de Janeiro - Centro",
+                "city": "Rio de Janeiro",
+                "state": "RJ",
+                "lat": -22.9068,
+                "lng": -43.1729,
+                "capacity": 600,
+            },
+            {
+                "id": "hub_mg_centro",
+                "name": "Belo Horizonte - Centro",
+                "city": "Belo Horizonte",
+                "state": "MG",
+                "lat": -19.9167,
+                "lng": -43.9345,
+                "capacity": 500,
+            },
         ]
 
         return pd.DataFrame(hubs_data)
 
-    def get_unique_values(self, df: pd.DataFrame, column: str) -> List[Any]:
+    def get_unique_values(self, df: pd.DataFrame, column: str) -> list[Any]:
         """
         Obtém valores únicos de uma coluna.
 

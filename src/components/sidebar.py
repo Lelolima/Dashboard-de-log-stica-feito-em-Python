@@ -4,16 +4,15 @@ Componente de Sidebar para o Dashboard.
 Inclui filtros por região, hub, status e controles.
 """
 
-from typing import List, Dict, Any, Optional
 import dash_bootstrap_components as dbc
 from dash import html
 
 
 def render_sidebar(
-    cities: Optional[List[str]] = None,
-    states: Optional[List[str]] = None,
-    hubs: Optional[List[Dict[str, str]]] = None,
-    statuses: Optional[List[str]] = None,
+    cities: list[str] | None = None,
+    states: list[str] | None = None,
+    hubs: list[dict[str, str]] | None = None,
+    statuses: list[str] | None = None,
 ) -> dbc.Card:
     """
     Renderiza a sidebar com filtros.
@@ -52,7 +51,6 @@ def render_sidebar(
                         className="mb-3",
                         switch=True,
                     ),
-
                     # Filtro por Cidade
                     html.Label("Cidade", className="form-label fw-semibold"),
                     dbc.Checklist(
@@ -62,17 +60,18 @@ def render_sidebar(
                         className="mb-3",
                         switch=True,
                     ),
-
                     # Filtro por Hub
                     html.Label("Hub", className="form-label fw-semibold"),
                     dbc.Checklist(
-                        options=[{"label": h.get("hub_name", h.get("id", "")), "value": h.get("id", "")} for h in hubs],
+                        options=[
+                            {"label": h.get("hub_name", h.get("id", "")), "value": h.get("id", "")}
+                            for h in hubs
+                        ],
                         value=[h.get("id", "") for h in hubs],
                         id="filter-hub",
                         className="mb-3",
                         switch=True,
                     ),
-
                     # Filtro por Status
                     html.Label("Status", className="form-label fw-semibold"),
                     dbc.Checklist(
@@ -87,7 +86,6 @@ def render_sidebar(
                         className="mb-3",
                         switch=True,
                     ),
-
                     # Botões de ação
                     html.Hr(className="my-3"),
                     dbc.Row(
@@ -115,7 +113,6 @@ def render_sidebar(
                         ],
                         className="g-2",
                     ),
-
                     # Info
                     html.Div(
                         [

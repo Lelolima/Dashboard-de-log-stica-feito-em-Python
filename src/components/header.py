@@ -4,9 +4,8 @@ Componente de Header para o Dashboard.
 Inclui logo, título, controles de tema e download.
 """
 
-from typing import Dict, Any
 import dash_bootstrap_components as dbc
-from dash import html, dcc
+from dash import dcc, html
 
 
 def render_header() -> html.Div:
@@ -38,7 +37,10 @@ def render_header() -> html.Div:
                                                     html.H1(
                                                         "Dashboard Logística",
                                                         className="mb-0 fw-bold",
-                                                        style={"fontSize": "1.75rem", "color": "var(--bs-primary)"},
+                                                        style={
+                                                            "fontSize": "1.75rem",
+                                                            "color": "var(--bs-primary)",
+                                                        },
                                                     ),
                                                     html.P(
                                                         "Análise de Entregas Loggi",
@@ -46,7 +48,10 @@ def render_header() -> html.Div:
                                                         style={"fontSize": "0.875rem"},
                                                     ),
                                                 ],
-                                                style={"display": "flex", "flexDirection": "column"},
+                                                style={
+                                                    "display": "flex",
+                                                    "flexDirection": "column",
+                                                },
                                             ),
                                         ],
                                         style={
@@ -67,7 +72,10 @@ def render_header() -> html.Div:
                                             # Toggle Dark Mode
                                             dbc.Button(
                                                 [
-                                                    html.I(className="bi bi-moon-stars-fill", id="theme-icon"),
+                                                    html.I(
+                                                        className="bi bi-moon-stars-fill",
+                                                        id="theme-icon",
+                                                    ),
                                                 ],
                                                 id="btn-toggle-theme",
                                                 color="outline-secondary",
@@ -92,14 +100,22 @@ def render_header() -> html.Div:
                                                 [
                                                     html.Span(
                                                         className="badge bg-success me-1",
-                                                        style={"width": "8px", "height": "8px", "borderRadius": "50%"},
+                                                        style={
+                                                            "width": "8px",
+                                                            "height": "8px",
+                                                            "borderRadius": "50%",
+                                                        },
                                                     ),
                                                     "Dados atualizados",
                                                 ],
                                                 className="text-muted small",
                                             ),
                                         ],
-                                        style={"display": "flex", "alignItems": "center", "justifyContent": "flex-end"},
+                                        style={
+                                            "display": "flex",
+                                            "alignItems": "center",
+                                            "justifyContent": "flex-end",
+                                        },
                                     )
                                 ],
                                 md=6,
@@ -126,8 +142,7 @@ def get_header_callbacks(app):
     Args:
         app: Instância do Dash app
     """
-    from dash import Output, Input, State
-    import dash
+    from dash import Input, Output, State
 
     @app.callback(
         Output("body", "data-bs-theme"),
