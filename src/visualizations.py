@@ -4,15 +4,11 @@ Módulo de visualizações com Plotly - Versão BI Enterprise.
 Cria gráficos profissionais com cores enterprise, tooltips customizados e interatividade.
 """
 
-from typing import Dict, Any, Optional, List
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 from src.styles_bi import (
-    CATEGORICAL_COLORS,
-    SEQUENTIAL_COLORS,
     STATUS_COLORS,
     get_categorical_scale,
 )
@@ -23,7 +19,7 @@ logger = get_logger(__name__)
 
 def create_map_chart(
     df: pd.DataFrame,
-    mapbox_token: Optional[str] = None,
+    mapbox_token: str | None = None,
     height: int = 500,
 ) -> go.Figure:
     """
@@ -40,19 +36,31 @@ def create_map_chart(
 
     # Mapear cores e ícones por status
     df = df.copy()
-    df["status_color"] = df.get("status", "pending").map({
-        "delivered": STATUS_COLORS["delivered"]["bg"],
-        "in_transit": STATUS_COLORS["in_transit"]["bg"],
-        "pending": STATUS_COLORS["pending"]["bg"],
-        "cancelled": STATUS_COLORS["cancelled"]["bg"],
-    }).fillna(STATUS_COLORS["pending"]["bg"])
+    df["status_color"] = (
+        df.get("status", "pending")
+        .map(
+            {
+                "delivered": STATUS_COLORS["delivered"]["bg"],
+                "in_transit": STATUS_COLORS["in_transit"]["bg"],
+                "pending": STATUS_COLORS["pending"]["bg"],
+                "cancelled": STATUS_COLORS["cancelled"]["bg"],
+            }
+        )
+        .fillna(STATUS_COLORS["pending"]["bg"])
+    )
 
-    df["status_label"] = df.get("status", "pending").map({
-        "delivered": STATUS_COLORS["delivered"]["label"],
-        "in_transit": STATUS_COLORS["in_transit"]["label"],
-        "pending": STATUS_COLORS["pending"]["label"],
-        "cancelled": STATUS_COLORS["cancelled"]["label"],
-    }).fillna("Pendente")
+    df["status_label"] = (
+        df.get("status", "pending")
+        .map(
+            {
+                "delivered": STATUS_COLORS["delivered"]["label"],
+                "in_transit": STATUS_COLORS["in_transit"]["label"],
+                "pending": STATUS_COLORS["pending"]["label"],
+                "cancelled": STATUS_COLORS["cancelled"]["label"],
+            }
+        )
+        .fillna("Pendente")
+    )
 
     # Criar hover template customizado
     hover_template = (
@@ -69,7 +77,7 @@ def create_map_chart(
             lat="latitude",
             lon="longitude",
             color="status",
-            color_discrete_map=dict(zip(df["status"], df["status_color"])),
+            color_discrete_map=dict(zip(df["status"], df["status_color"], strict=False)),
             hover_name="id",
             hover_data=["city", "state", "status_label"],
             zoom=8,
@@ -187,10 +195,12 @@ def create_bar_chart(
     colors = get_categorical_scale(len(grouped))
 
     # Hover template formatado
+    # Antes: a f-string referenciava o nome indefinido `text` (NameError com
+    # orientation="h") e, por precedência, o modo "v" perdia o valor do hover.
     hover_template = (
-        "<b>%{x}</b><br>" if orientation == "v" else "<b>%{y}</b><br>"
-        f"{y_label}: %{text:,}<br>"
-        "<extra></extra>"
+        ("<b>%{x}</b><br>" if orientation == "v" else "<b>%{y}</b><br>")
+        + f"{y_label}: %{{text:,}}<br>"
+        + "<extra></extra>"
     )
 
     fig = px.bar(
@@ -207,7 +217,11 @@ def create_bar_chart(
     fig.update_traces(
         texttemplate="%{text:,}",
         textposition="outside",
-        hovertemplate=hover_template.replace("%{text:,}", "%{y:,}") if orientation == "v" else hover_template.replace("%{text:,}", "%{x:,}"),
+        hovertemplate=(
+            hover_template.replace("%{text:,}", "%{y:,}")
+            if orientation == "v"
+            else hover_template.replace("%{text:,}", "%{x:,}")
+        ),
         marker=dict(
             line=dict(width=1, color="white"),
             opacity=0.9,
@@ -222,12 +236,23 @@ def create_bar_chart(
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
         hovermode="x unified" if orientation == "v" else "y unified",
-        font=dict(family='"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', size=13),
+        font=dict(
+            family='"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            size=13,
+        ),
     )
 
     # Grid lines sutis
-    fig.update_xaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)", title_text=group_by.title() if orientation == "v" else y_label)
-    fig.update_yaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)", title_text=y_label if orientation == "v" else group_by.title())
+    fig.update_xaxes(
+        showgrid=True,
+        gridcolor="rgba(0,0,0,0.05)",
+        title_text=group_by.title() if orientation == "v" else y_label,
+    )
+    fig.update_yaxes(
+        showgrid=True,
+        gridcolor="rgba(0,0,0,0.05)",
+        title_text=y_label if orientation == "v" else group_by.title(),
+    )
 
     logger.info(f"Gráfico de barras enterprise criado: {title}")
     return fig
@@ -284,7 +309,9 @@ def create_pie_chart(
     )
 
     fig.update_layout(
-        title=dict(text=f"🥧 Distribuição por {group_by.title()}", font=dict(size=16, weight="bold")),
+        title=dict(
+            text=f"🥧 Distribuição por {group_by.title()}", font=dict(size=16, weight="bold")
+        ),
         height=height,
         margin=dict(l=20, r=20, t=60, b=20),
         showlegend=True,
@@ -297,7 +324,10 @@ def create_pie_chart(
             bgcolor="rgba(255,255,255,0.8)",
         ),
         hovermode="closest",
-        font=dict(family='"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', size=13),
+        font=dict(
+            family='"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            size=13,
+        ),
     )
 
     logger.info(f"Gráfico de pizza enterprise criado: {group_by}")
@@ -345,13 +375,18 @@ def create_line_chart(
         height=height,
         margin=dict(l=60, r=20, t=60, b=60),
         hovermode="x unified",
-        font=dict(family='"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', size=13),
+        font=dict(
+            family='"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            size=13,
+        ),
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
     )
 
     fig.update_xaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)")
-    fig.update_yaxes(showgrid=True, gridcolor="rgba(0,0,0,0.05)", title_text=y_col.replace("_", " ").title())
+    fig.update_yaxes(
+        showgrid=True, gridcolor="rgba(0,0,0,0.05)", title_text=y_col.replace("_", " ").title()
+    )
 
     logger.info(f"Gráfico de linha enterprise criado: {title}")
     return fig
@@ -413,15 +448,60 @@ def create_hub_capacity_chart(
         showlegend=True,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         hovermode="y unified",
-        font=dict(family='"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', size=13),
+        font=dict(
+            family='"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            size=13,
+        ),
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
     )
 
-    fig.update_xaxes(title_text="📦 Quantidade de Entregas", showgrid=True, gridcolor="rgba(0,0,0,0.05)")
+    fig.update_xaxes(
+        title_text="📦 Quantidade de Entregas", showgrid=True, gridcolor="rgba(0,0,0,0.05)"
+    )
     fig.update_yaxes(title_text="🏢 Hub")
 
     logger.info(f"Gráfico de capacidade criado: {len(merged)} hubs")
+    return fig
+
+
+def create_heatmap(
+    df: pd.DataFrame,
+    height: int = 500,
+    radius: int = 20,
+) -> go.Figure:
+    """
+    Cria mapa de calor (densidade) de entregas a partir de latitude/longitude.
+
+    Usa ``go.Densitymap`` (MapLibre), que não exige token Mapbox.
+    """
+    if df.empty or not {"latitude", "longitude"}.issubset(df.columns):
+        return _create_empty_map(height)
+
+    pontos = df.dropna(subset=["latitude", "longitude"])
+    if pontos.empty:
+        return _create_empty_map(height)
+
+    fig = go.Figure(
+        go.Densitymap(
+            lat=pontos["latitude"],
+            lon=pontos["longitude"],
+            radius=radius,
+            colorscale="YlOrRd",
+            showscale=True,
+        )
+    )
+    fig.update_layout(
+        map=dict(
+            style="carto-positron",
+            center=dict(
+                lat=float(pontos["latitude"].mean()), lon=float(pontos["longitude"].mean())
+            ),
+            zoom=4,
+        ),
+        height=height,
+        margin=dict(l=0, r=0, t=0, b=0),
+    )
     return fig
 
 

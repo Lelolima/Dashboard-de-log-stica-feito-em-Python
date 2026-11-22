@@ -2,15 +2,16 @@
 Testes do módulo de Visualizações.
 """
 
-import pytest
 import pandas as pd
 import plotly.graph_objects as go
+import pytest
+
 from src.visualizations import (
-    create_map_chart,
-    create_bar_chart,
-    create_pie_chart,
-    create_heatmap,
     _create_empty_chart,
+    create_bar_chart,
+    create_heatmap,
+    create_map_chart,
+    create_pie_chart,
 )
 
 
@@ -20,14 +21,16 @@ class TestCreateMapChart:
     @pytest.fixture
     def sample_df(self):
         """Fixture com dados de exemplo."""
-        return pd.DataFrame({
-            "id": ["ENT-001", "ENT-002"],
-            "latitude": [-23.5505, -22.9068],
-            "longitude": [-46.6333, -43.1729],
-            "city": ["São Paulo", "Rio de Janeiro"],
-            "state": ["SP", "RJ"],
-            "status": ["delivered", "pending"],
-        })
+        return pd.DataFrame(
+            {
+                "id": ["ENT-001", "ENT-002"],
+                "latitude": [-23.5505, -22.9068],
+                "longitude": [-46.6333, -43.1729],
+                "city": ["São Paulo", "Rio de Janeiro"],
+                "state": ["SP", "RJ"],
+                "status": ["delivered", "pending"],
+            }
+        )
 
     def test_create_map_with_data(self, sample_df):
         """Testa criação de mapa com dados."""
@@ -59,11 +62,13 @@ class TestCreateBarChart:
     @pytest.fixture
     def sample_df(self):
         """Fixture com dados."""
-        return pd.DataFrame({
-            "city": ["SP", "SP", "RJ", "BH", "SP"],
-            "status": ["delivered", "pending", "delivered", "pending", "delivered"],
-            "weight": [10, 5, 8, 12, 7],
-        })
+        return pd.DataFrame(
+            {
+                "city": ["SP", "SP", "RJ", "BH", "SP"],
+                "status": ["delivered", "pending", "delivered", "pending", "delivered"],
+                "weight": [10, 5, 8, 12, 7],
+            }
+        )
 
     def test_bar_chart_by_city(self, sample_df):
         """Testa gráfico de barras por cidade."""
@@ -88,9 +93,11 @@ class TestCreatePieChart:
 
     @pytest.fixture
     def sample_df(self):
-        return pd.DataFrame({
-            "status": ["delivered", "pending", "delivered", "cancelled"],
-        })
+        return pd.DataFrame(
+            {
+                "status": ["delivered", "pending", "delivered", "cancelled"],
+            }
+        )
 
     def test_pie_chart_with_data(self, sample_df):
         """Testa gráfico de pizza com dados."""
@@ -105,10 +112,12 @@ class TestCreateHeatmap:
 
     @pytest.fixture
     def sample_df(self):
-        return pd.DataFrame({
-            "latitude": [-23.5505, -23.5600, -23.5700],
-            "longitude": [-46.6333, -46.6400, -46.6500],
-        })
+        return pd.DataFrame(
+            {
+                "latitude": [-23.5505, -23.5600, -23.5700],
+                "longitude": [-46.6333, -46.6400, -46.6500],
+            }
+        )
 
     def test_heatmap_with_data(self, sample_df):
         """Testa heatmap com dados."""
@@ -125,3 +134,20 @@ class TestEmptyChart:
 
         assert isinstance(fig, go.Figure)
         assert fig.layout.height == 300
+
+
+class TestBarChartHover:
+    """Regressão: hover template quebrado (f-string com nome indefinido `text`)."""
+
+    @pytest.fixture
+    def sample_df(self):
+        return pd.DataFrame({"city": ["São Paulo", "Rio", "São Paulo"]})
+
+    def test_bar_chart_horizontal(self, sample_df):
+        fig = create_bar_chart(sample_df, group_by="city", orientation="h")
+        assert isinstance(fig, go.Figure)
+        assert "Quantidade: %{x:,}" in fig.data[0].hovertemplate
+
+    def test_bar_chart_vertical_hover_tem_valor(self, sample_df):
+        fig = create_bar_chart(sample_df, group_by="city")
+        assert "Quantidade: %{y:,}" in fig.data[0].hovertemplate
