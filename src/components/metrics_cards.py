@@ -4,12 +4,13 @@ Componente de Cards de Métricas (KPIs).
 Exibe 4 cards com métricas principais do dashboard.
 """
 
-from typing import Dict, Any, Optional
+from typing import Any
+
 import dash_bootstrap_components as dbc
 from dash import html
 
 
-def render_metrics_cards(metrics: Optional[Dict[str, Any]] = None) -> html.Div:
+def render_metrics_cards(metrics: dict[str, Any] | None = None) -> html.Div:
     """
     Renderiza cards de métricas (KPIs).
 
@@ -78,7 +79,10 @@ def render_metrics_cards(metrics: Optional[Dict[str, Any]] = None) -> html.Div:
                     [
                         html.Div(
                             [
-                                html.I(className="bi bi-check-circle-fill", style={"fontSize": "2rem", "color": "#198754"}),
+                                html.I(
+                                    className="bi bi-check-circle-fill",
+                                    style={"fontSize": "2rem", "color": "#198754"},
+                                ),
                                 html.Span(
                                     "Taxa de Sucesso",
                                     className="text-muted small",
@@ -97,7 +101,9 @@ def render_metrics_cards(metrics: Optional[Dict[str, Any]] = None) -> html.Div:
                             style={"fontSize": "2rem", "color": "#198754"},
                         ),
                         html.Small(
-                            f"{metrics.get('entregas_entregues', 0):,} entregas realizadas".replace(",", "."),
+                            f"{metrics.get('entregas_entregues', 0):,} entregas realizadas".replace(
+                                ",", "."
+                            ),
                             className="text-muted",
                         ),
                     ]
@@ -114,7 +120,10 @@ def render_metrics_cards(metrics: Optional[Dict[str, Any]] = None) -> html.Div:
                     [
                         html.Div(
                             [
-                                html.I(className="bi bi-clock-fill", style={"fontSize": "2rem", "color": "#ffc107"}),
+                                html.I(
+                                    className="bi bi-clock-fill",
+                                    style={"fontSize": "2rem", "color": "#ffc107"},
+                                ),
                                 html.Span(
                                     "Em Andamento",
                                     className="text-muted small",
@@ -154,7 +163,10 @@ def render_metrics_cards(metrics: Optional[Dict[str, Any]] = None) -> html.Div:
                     [
                         html.Div(
                             [
-                                html.I(className="bi bi-weight-hanging-fill", style={"fontSize": "2rem", "color": "#6f42c1"}),
+                                html.I(
+                                    className="bi bi-weight-hanging-fill",
+                                    style={"fontSize": "2rem", "color": "#6f42c1"},
+                                ),
                                 html.Span(
                                     "Peso Total",
                                     className="text-muted small",
@@ -185,10 +197,9 @@ def render_metrics_cards(metrics: Optional[Dict[str, Any]] = None) -> html.Div:
         ),
     ]
 
-    return html.Div(
-        [dbc.Row(cards, className="g-3")],
-        id="metrics-container",
-    )
+    # O id "metrics-container" pertence ao Div pai em src/app.py (alvo do callback);
+    # repeti-lo aqui gerava DuplicateIdError e HTTP 500 na página inicial.
+    return html.Div([dbc.Row(cards, className="g-3")])
 
 
 def render_metrics_loading() -> html.Div:
