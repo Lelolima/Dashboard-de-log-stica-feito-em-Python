@@ -4,40 +4,31 @@ Design System para Dashboard BI Enterprise.
 Paleta de cores profissional, gradients e estilos para visualizações enterprise.
 """
 
-from typing import Dict, Any, List
-
-
 # ============================================
 # PALETA DE CORES PROFISSIONAL PARA BI
 # ============================================
 
 COLORS = {
     # Cores Primárias
-    "primary": "#2563eb",       # Azul enterprise
+    "primary": "#2563eb",  # Azul enterprise
     "primary_dark": "#1d4ed8",
     "primary_light": "#3b82f6",
-
-    "secondary": "#64748b",     # Slate
+    "secondary": "#64748b",  # Slate
     "secondary_dark": "#475569",
     "secondary_light": "#94a3b8",
-
     # Cores de Status
-    "success": "#10b981",       # Emerald
+    "success": "#10b981",  # Emerald
     "success_dark": "#059669",
     "success_light": "#34d399",
-
-    "warning": "#f59e0b",       # Amber
+    "warning": "#f59e0b",  # Amber
     "warning_dark": "#d97706",
     "warning_light": "#fbbf24",
-
-    "danger": "#ef4444",        # Red
+    "danger": "#ef4444",  # Red
     "danger_dark": "#dc2626",
     "danger_light": "#f87171",
-
-    "info": "#06b6d4",          # Cyan
+    "info": "#06b6d4",  # Cyan
     "info_dark": "#0891b2",
     "info_light": "#22d3ee",
-
     # Cores Neutras
     "neutral_50": "#f8fafc",
     "neutral_100": "#f1f5f9",
@@ -224,7 +215,8 @@ DARK_PLOTLY_LAYOUT = {
 # HELPER FUNCTIONS
 # ============================================
 
-def get_status_color(status: str, dark: bool = False) -> Dict[str, str]:
+
+def get_status_color(status: str, dark: bool = False) -> dict[str, str]:
     """
     Retorna cores para um status específico.
 
@@ -245,7 +237,7 @@ def get_status_color(status: str, dark: bool = False) -> Dict[str, str]:
     return color
 
 
-def get_categorical_scale(num_colors: int = None) -> List[str]:
+def get_categorical_scale(num_colors: int = None) -> list[str]:
     """
     Retorna escala categórica com número específico de cores.
 

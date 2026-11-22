@@ -4,9 +4,9 @@ Processamento de dados para o dashboard.
 Transforma dados brutos em métricas e aggregações para visualização.
 """
 
-from typing import Dict, List, Any, Optional
+from typing import Any
+
 import pandas as pd
-import numpy as np
 
 from src.utils.logger import get_logger
 
@@ -32,7 +32,7 @@ class DataProcessor:
         self.df = df.copy()
         logger.info("DataProcessor inicializado", rows=len(self.df))
 
-    def calcular_metricas(self) -> Dict[str, Any]:
+    def calcular_metricas(self) -> dict[str, Any]:
         """
         Calcula métricas principais do dashboard.
 
@@ -45,7 +45,9 @@ class DataProcessor:
             return self._metricas_vazias()
 
         # Contar por status
-        status_counts = self.df["status"].value_counts().to_dict() if "status" in self.df.columns else {}
+        status_counts = (
+            self.df["status"].value_counts().to_dict() if "status" in self.df.columns else {}
+        )
 
         entregas_pendentes = status_counts.get("pending", 0)
         entregas_em_transito = status_counts.get("in_transit", 0)
@@ -79,7 +81,7 @@ class DataProcessor:
         logger.info("Métricas calculadas", total=total, taxa_sucesso=taxa_sucesso)
         return metricas
 
-    def _metricas_vazias(self) -> Dict[str, Any]:
+    def _metricas_vazias(self) -> dict[str, Any]:
         """Retorna métricas vazias para DataFrame vazio."""
         return {
             "total_entregas": 0,
@@ -94,7 +96,9 @@ class DataProcessor:
             "valor_medio": 0.0,
         }
 
-    def filtrar_por_regiao(self, estado: Optional[str] = None, cidade: Optional[str] = None) -> "DataProcessor":
+    def filtrar_por_regiao(
+        self, estado: str | None = None, cidade: str | None = None
+    ) -> "DataProcessor":
         """
         Filtra dados por região.
 
@@ -115,7 +119,7 @@ class DataProcessor:
 
         return self
 
-    def filtrar_por_status(self, statuses: List[str]) -> "DataProcessor":
+    def filtrar_por_status(self, statuses: list[str]) -> "DataProcessor":
         """
         Filtra dados por status.
 
@@ -131,7 +135,7 @@ class DataProcessor:
 
         return self
 
-    def filtrar_por_hub(self, hub_ids: List[str]) -> "DataProcessor":
+    def filtrar_por_hub(self, hub_ids: list[str]) -> "DataProcessor":
         """
         Filtra dados por hub.
 
@@ -157,13 +161,26 @@ class DataProcessor:
         if "city" not in self.df.columns:
             return pd.DataFrame()
 
-        grouped = self.df.groupby("city").agg({
-            "id": "count",
-            "weight": ["sum", "mean"],
-            "value": ["sum", "mean"],
-        }).reset_index()
+        grouped = (
+            self.df.groupby("city")
+            .agg(
+                {
+                    "id": "count",
+                    "weight": ["sum", "mean"],
+                    "value": ["sum", "mean"],
+                }
+            )
+            .reset_index()
+        )
 
-        grouped.columns = ["cidade", "total_entregas", "peso_total", "peso_medio", "valor_total", "valor_medio"]
+        grouped.columns = [
+            "cidade",
+            "total_entregas",
+            "peso_total",
+            "peso_medio",
+            "valor_total",
+            "valor_medio",
+        ]
         grouped = grouped.sort_values("total_entregas", ascending=False)
 
         logger.info("Agrupamento por cidade realizado", cities=len(grouped))
@@ -179,12 +196,18 @@ class DataProcessor:
         if "hub_id" not in self.df.columns:
             return pd.DataFrame()
 
-        grouped = self.df.groupby("hub_id").agg({
-            "id": "count",
-            "hub_name": "first",
-            "weight": "sum",
-            "value": "sum",
-        }).reset_index()
+        grouped = (
+            self.df.groupby("hub_id")
+            .agg(
+                {
+                    "id": "count",
+                    "hub_name": "first",
+                    "weight": "sum",
+                    "value": "sum",
+                }
+            )
+            .reset_index()
+        )
 
         grouped.columns = ["hub_id", "hub_name", "total_entregas", "peso_total", "valor_total"]
         grouped = grouped.sort_values("total_entregas", ascending=False)
@@ -202,11 +225,17 @@ class DataProcessor:
         if "status" not in self.df.columns:
             return pd.DataFrame()
 
-        grouped = self.df.groupby("status").agg({
-            "id": "count",
-            "weight": "sum",
-            "value": "sum",
-        }).reset_index()
+        grouped = (
+            self.df.groupby("status")
+            .agg(
+                {
+                    "id": "count",
+                    "weight": "sum",
+                    "value": "sum",
+                }
+            )
+            .reset_index()
+        )
 
         grouped.columns = ["status", "total_entregas", "peso_total", "valor_total"]
         grouped = grouped.sort_values("total_entregas", ascending=False)
@@ -230,19 +259,19 @@ class DataProcessor:
 
         return self.df[available_cols].copy()
 
-    def get_unique_cities(self) -> List[str]:
+    def get_unique_cities(self) -> list[str]:
         """Retorna lista de cidades únicas."""
         if "city" not in self.df.columns:
             return []
         return sorted(self.df["city"].dropna().unique().tolist())
 
-    def get_unique_states(self) -> List[str]:
+    def get_unique_states(self) -> list[str]:
         """Retorna lista de estados únicos."""
         if "state" not in self.df.columns:
             return []
         return sorted(self.df["state"].dropna().unique().tolist())
 
-    def get_unique_hubs(self) -> List[Dict[str, str]]:
+    def get_unique_hubs(self) -> list[dict[str, str]]:
         """Retorna lista de hubs únicos com id e nome."""
         if "hub_id" not in self.df.columns:
             return []
@@ -250,7 +279,7 @@ class DataProcessor:
         hubs = self.df[["hub_id", "hub_name"]].drop_duplicates()
         return hubs.to_dict("records")
 
-    def get_unique_statuses(self) -> List[str]:
+    def get_unique_statuses(self) -> list[str]:
         """Retorna lista de statuses únicos."""
         if "status" not in self.df.columns:
             return []

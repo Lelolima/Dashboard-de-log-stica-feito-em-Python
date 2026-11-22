@@ -4,10 +4,10 @@ Configurações da aplicação usando Pydantic Settings.
 Centraliza todas as configurações do dashboard com validação de tipos.
 """
 
-from typing import Literal, Optional
+from typing import Literal
+
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-import os
 
 
 class Settings(BaseSettings):
@@ -53,20 +53,20 @@ class Settings(BaseSettings):
     log_format: Literal["json", "console"] = Field(default="json", description="Formato dos logs")
 
     # External services
-    mapbox_token: Optional[str] = Field(default=None, description="Token API Mapbox")
+    mapbox_token: str | None = Field(default=None, description="Token API Mapbox")
 
     # Cache
     cache_type: Literal["diskcache", "redis", "memory"] = Field(
         default="diskcache", description="Tipo de cache"
     )
-    redis_url: Optional[str] = Field(default=None, description="URL Redis para cache")
+    redis_url: str | None = Field(default=None, description="URL Redis para cache")
     cache_dir: str = Field(default=".cache", description="Diretório para diskcache")
 
     # Data
     data_source: Literal["local", "api", "database"] = Field(
         default="local", description="Fonte de dados"
     )
-    data_api_url: Optional[str] = Field(default=None, description="URL da API de dados")
+    data_api_url: str | None = Field(default=None, description="URL da API de dados")
 
     # Security
     secret_key: str = Field(

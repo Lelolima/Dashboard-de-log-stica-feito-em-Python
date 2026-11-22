@@ -19,12 +19,14 @@ ignore = [
     "E501",  # line too long (Black cuide disso)
     "B008",  # do not perform function calls in argument defaults
     "B904",  # raise without from inside except clause
+    "C408",  # dict(...) é o estilo idiomático do Plotly
 ]
 
 [lint.per-file-ignores]
 "__init__.py" = ["F401"]  # unused imports in __init__
 "tests/*" = ["S101", "ARG"]  # assert, unused arguments in tests
-"src/callbacks.py" = ["ARG001"]  # unused arguments em callbacks Dash
+"src/callbacks.py" = ["ARG001"]
+"src/components/header.py" = ["ARG001"]  # assinatura exigida por callbacks Dash  # unused arguments em callbacks Dash
 
 [lint.isort]
 known-first-party = ["src"]

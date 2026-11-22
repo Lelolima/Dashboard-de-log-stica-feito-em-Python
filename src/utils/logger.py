@@ -7,9 +7,9 @@ e formato legível para desenvolvimento.
 
 import logging
 import sys
-from typing import Optional
 
 import structlog
+
 from src.config import settings
 
 
@@ -59,7 +59,7 @@ def setup_logging() -> None:
     )
 
 
-def get_logger(name: Optional[str] = None) -> structlog.BoundLogger:
+def get_logger(name: str | None = None) -> structlog.BoundLogger:
     """
     Obtém um logger estruturado nomeado.
 

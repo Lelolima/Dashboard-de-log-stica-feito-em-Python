@@ -4,8 +4,7 @@ Módulo de estilos do Dashboard.
 Define cores, temas e estilos para componentes.
 """
 
-from typing import Dict, Any
-
+from typing import Any
 
 # ============================================
 # Cores do Design System
@@ -34,7 +33,7 @@ STATUS_COLORS = {
 # Tema Light (Bootstrap default)
 # ============================================
 
-THEME_LIGHT: Dict[str, Any] = {
+THEME_LIGHT: dict[str, Any] = {
     "bg_body": "#f8f9fa",
     "bg_card": "#ffffff",
     "bg_header": "#ffffff",
@@ -55,7 +54,7 @@ THEME_LIGHT: Dict[str, Any] = {
 # Tema Dark
 # ============================================
 
-THEME_DARK: Dict[str, Any] = {
+THEME_DARK: dict[str, Any] = {
     "bg_body": "#1a1a2e",
     "bg_card": "#16213e",
     "bg_header": "#16213e",
@@ -175,7 +174,7 @@ FONT_WEIGHTS = {
 # ============================================
 
 
-def get_theme_styles(dark: bool = False) -> Dict[str, Any]:
+def get_theme_styles(dark: bool = False) -> dict[str, Any]:
     """
     Retorna estilos do tema.
 
@@ -200,11 +199,11 @@ def get_theme_styles(dark: bool = False) -> Dict[str, Any]:
     }
 
 
-def get_card_style(dark: bool = False) -> Dict[str, Any]:
+def get_card_style(dark: bool = False) -> dict[str, Any]:
     """Retorna estilo de card baseado no tema."""
     return CARD_STYLE_DARK if dark else CARD_STYLE
 
 
-def get_layout_style(dark: bool = False) -> Dict[str, Any]:
+def get_layout_style(dark: bool = False) -> dict[str, Any]:
     """Retorna estilo de layout baseado no tema."""
     return LAYOUT_STYLE_DARK if dark else LAYOUT_STYLE

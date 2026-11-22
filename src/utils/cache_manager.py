@@ -6,9 +6,9 @@ Suporta múltiplos backends: diskcache, redis, memory.
 
 import hashlib
 import json
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable, Optional
-from datetime import timedelta
+from typing import Any
 
 import diskcache
 
@@ -29,9 +29,9 @@ class CacheManager:
 
     def __init__(
         self,
-        cache_type: Optional[str] = None,
-        redis_url: Optional[str] = None,
-        cache_dir: Optional[str] = None,
+        cache_type: str | None = None,
+        redis_url: str | None = None,
+        cache_dir: str | None = None,
         default_ttl: int = 300,
     ):
         """
@@ -64,6 +64,7 @@ class CacheManager:
         elif self.cache_type == "redis" and self.redis_url:
             try:
                 import redis
+
                 self._redis_client = redis.from_url(self.redis_url, decode_responses=True)
                 self._redis_client.ping()
                 logger.info("Cache redis inicializado", url=self.redis_url)
@@ -79,7 +80,7 @@ class CacheManager:
         key_data = f"{func_name}:{args}:{sorted(kwargs.items())}"
         return hashlib.md5(key_data.encode()).hexdigest()
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         """
         Obtém valor do cache.
 
@@ -103,7 +104,7 @@ class CacheManager:
         else:
             return self._cache.get(key)
 
-    def set(self, key: str, value: Any, ttl: Optional[int] = None) -> bool:
+    def set(self, key: str, value: Any, ttl: int | None = None) -> bool:
         """
         Armazena valor no cache.
 
@@ -119,7 +120,6 @@ class CacheManager:
 
         if self._redis_client:
             try:
-                import redis
                 self._redis_client.setex(key, ttl, json.dumps(value))
                 return True
             except Exception as e:
@@ -164,7 +164,7 @@ class CacheManager:
             self._cache.clear()
             return True
 
-    def cached(self, ttl: Optional[int] = None, key_prefix: str = ""):
+    def cached(self, ttl: int | None = None, key_prefix: str = ""):
         """
         Decorator para cache de funções.
 
@@ -178,6 +178,7 @@ class CacheManager:
             ... def get_expensive_data(query: str) -> dict:
             ...     return fetch_data(query)
         """
+
         def decorator(func: Callable) -> Callable:
             @wraps(func)
             def wrapper(*args, **kwargs):
@@ -196,6 +197,7 @@ class CacheManager:
                 return result
 
             return wrapper
+
         return decorator
 
     def close(self) -> None:
