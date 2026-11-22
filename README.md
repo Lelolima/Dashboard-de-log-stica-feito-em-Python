@@ -7,6 +7,8 @@
 
 > Dashboard enterprise para análise e monitoramento de operações logísticas em tempo real.
 
+> ⚠️ **Dados:** o repositório não traz dados reais. Sem `data/deliveries.json` (ou `DASH_DATA_SOURCE=api`), o app gera 500 entregas **simuladas** (seed fixa) e exibe um aviso na tela. "Loggi" é só o tema do projeto; não há integração com a empresa.
+
 ## 🎬 Demo Interativa
 
 ### Dashboard Principal
@@ -176,8 +178,8 @@ O **Dashboard Logística Loggi** é uma aplicação web profissional para visual
 
 ```bash
 # Clonar repositório
-git clone https://github.com/Lelolima/dashboard-logistica-loggi.git
-cd dashboard-logistica-loggi
+git clone https://github.com/Lelolima/Dashboard-de-log-stica-feito-em-Python.git
+cd Dashboard-de-log-stica-feito-em-Python
 
 # Criar ambiente virtual
 python -m venv venv
@@ -190,8 +192,11 @@ pip install -r requirements.txt
 # Copiar variáveis de ambiente
 cp .env.example .env
 
-# Executar dashboard
-python -m src.app
+# Executar dashboard (servidor de desenvolvimento)
+python main.py
+
+# Ou servidor WSGI de produção
+waitress-serve --port=8050 src.wsgi:server
 ```
 
 Acesse: `http://localhost:8050`
@@ -211,15 +216,17 @@ Acesse: `http://localhost:8050`
 
 ### Com Data_SOURCE Local (padrão)
 
-O dashboard já inclui dados de exemplo gerados automaticamente.
+Coloque um JSON de entregas em `data/deliveries.json`. Se o arquivo não existir, o app usa dados de exemplo simulados e mostra um aviso.
+
+Todas as variáveis de ambiente usam o prefixo `DASH_` (veja `.env.example` e `src/config.py`).
 
 ### Conectando a API Externa
 
 Edite `.env`:
 
 ```ini
-DATA_SOURCE=api
-DATA_API_URL=https://sua-api.com/entregas
+DASH_DATA_SOURCE=api
+DASH_DATA_API_URL=https://sua-api.com/entregas
 ```
 
 ### Personalizando Mapas
@@ -227,7 +234,7 @@ DATA_API_URL=https://sua-api.com/entregas
 Para mapas avançados com Mapbox:
 
 ```ini
-MAPBOX_TOKEN=pk.eyJ...
+DASH_MAPBOX_TOKEN=<seu-token>
 ```
 
 Obtenha seu token em: https://account.mapbox.com/
@@ -291,7 +298,7 @@ dashboard-logistica-loggi/
 # Conectar repositório no Render
 # Definir variáveis de ambiente
 # Build command: pip install -r requirements.txt
-# Start command: gunicorn -b 0.0.0.0:$PORT src.app:server
+# Start command: waitress-serve --port=$PORT src.wsgi:server
 ```
 
 ### AWS ECS
@@ -334,10 +341,10 @@ open htmlcov/index.html
 
 ```bash
 # Lint com Ruff
-ruff check src/
+ruff check src/ tests/
 
 # Formatar com Black
-black src/
+black --check src/ tests/
 
 # Verificar tipos (opcional)
 mypy src/
@@ -416,8 +423,8 @@ docker-compose up --build
 ### 2 minutos desenvolvimento local
 
 ```bash
-git clone https://github.com/Lelolima/dashboard-logistica-loggi.git
-cd dashboard-logistica-loggi
+git clone https://github.com/Lelolima/Dashboard-de-log-stica-feito-em-Python.git
+cd Dashboard-de-log-stica-feito-em-Python
 python -m venv venv
 venv\Scripts\activate  # Windows
 pip install -r requirements.txt
