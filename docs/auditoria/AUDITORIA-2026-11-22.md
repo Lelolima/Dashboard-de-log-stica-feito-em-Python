@@ -45,4 +45,4 @@
 - **diskcache (PYSEC-2026-2447) sem correção upstream.** O backend padrão é `diskcache`. Se o diretório de cache puder ser escrito por terceiros, o risco é relevante. Alternativa sem mudar código: `DASH_CACHE_TYPE=memory`. Trocar a biblioteca é decisão do dono.
 - Mudança de semântica no filtro: agora vale a seleção completa do checklist. Antes só o 1º item era considerado, o que tratei como bug; confirme se essa é a regra desejada.
 - O mapa no callback não repassa `mapbox_token` (só o layout inicial usa). Não alterei.
-- A cobertura total segue baixa (~50%): páginas e cache_manager quase sem testes.
+- A cobertura total segue moderada (60% medidos pelo pytest-cov): páginas e cache_manager quase sem testes.
