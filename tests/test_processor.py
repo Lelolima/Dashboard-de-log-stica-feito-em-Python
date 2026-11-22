@@ -2,8 +2,9 @@
 Testes do módulo DataProcessor.
 """
 
-import pytest
 import pandas as pd
+import pytest
+
 from src.data.processor import DataProcessor
 
 
@@ -13,16 +14,20 @@ class TestDataProcessor:
     @pytest.fixture
     def sample_df(self):
         """Fixture com dados de exemplo."""
-        return pd.DataFrame({
-            "id": ["ENT-001", "ENT-002", "ENT-003", "ENT-004"],
-            "city": ["SP", "SP", "RJ", "BH"],
-            "state": ["SP", "SP", "RJ", "MG"],
-            "status": ["delivered", "pending", "delivered", "cancelled"],
-            "hub_id": ["hub_sp", "hub_sp", "hub_rj", "hub_bh"],
-            "hub_name": ["SP Centro", "SP Centro", "RJ Centro", "BH Centro"],
-            "weight": [10.5, 5.0, 8.0, 12.0],
-            "value": [100.0, 50.0, 80.0, 120.0],
-        })
+        return pd.DataFrame(
+            {
+                "id": ["ENT-001", "ENT-002", "ENT-003", "ENT-004"],
+                "city": ["SP", "SP", "RJ", "BH"],
+                "state": ["SP", "SP", "RJ", "MG"],
+                "status": ["delivered", "pending", "delivered", "cancelled"],
+                "hub_id": ["hub_sp", "hub_sp", "hub_rj", "hub_bh"],
+                "hub_name": ["SP Centro", "SP Centro", "RJ Centro", "BH Centro"],
+                "weight": [10.5, 5.0, 8.0, 12.0],
+                "value": [100.0, 50.0, 80.0, 120.0],
+                "latitude": [-23.55, -23.56, -22.90, -19.92],
+                "longitude": [-46.63, -46.64, -43.17, -43.94],
+            }
+        )
 
     def test_calcular_metricas(self, sample_df):
         """Testa cálculo de métricas."""
@@ -98,6 +103,11 @@ class TestDataProcessor:
         statuses = processor.get_unique_statuses()
 
         assert statuses == ["cancelled", "delivered", "pending"]
+
+    def test_get_dados_mapa_sem_coordenadas(self, sample_df):
+        """Sem latitude/longitude o processador devolve DataFrame vazio."""
+        processor = DataProcessor(sample_df.drop(columns=["latitude", "longitude"]))
+        assert processor.get_dados_mapa().empty
 
     def test_get_dados_mapa(self, sample_df):
         """Testa preparação de dados para mapa."""
