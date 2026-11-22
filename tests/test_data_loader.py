@@ -2,10 +2,10 @@
 Testes do módulo DataLoader.
 """
 
-import pytest
 import pandas as pd
+import pytest
+
 from src.data.loader import DataLoader
-from src.config import settings
 
 
 class TestDataLoader:
@@ -35,14 +35,16 @@ class TestDataLoader:
         loader = DataLoader()
 
         # Criar dados brutos
-        raw_data = pd.DataFrame({
-            "ID": ["ENT-001", "ENT-002", "ENT-001"],  # duplicata
-            "Latitude": [-23.5505, -22.9068, None],  # nulo
-            "Longitude": [-46.6333, -43.1729, -46.6333],
-            "City": ["São Paulo", "Rio de Janeiro", "São Paulo"],
-            "State": ["SP", "RJ", "SP"],
-            "Status": ["delivered", "pending", "delivered"],
-        })
+        raw_data = pd.DataFrame(
+            {
+                "ID": ["ENT-001", "ENT-002", "ENT-001"],  # duplicata
+                "Latitude": [-23.5505, -22.9068, None],  # nulo
+                "Longitude": [-46.6333, -43.1729, -46.6333],
+                "City": ["São Paulo", "Rio de Janeiro", "São Paulo"],
+                "State": ["SP", "RJ", "SP"],
+                "Status": ["delivered", "pending", "delivered"],
+            }
+        )
 
         processed = loader._process_dataframe(raw_data)
 
@@ -59,10 +61,12 @@ class TestDataLoader:
     def test_get_unique_values(self):
         """Testa obtenção de valores únicos."""
         loader = DataLoader()
-        df = pd.DataFrame({
-            "city": ["SP", "RJ", "SP", "BH"],
-            "state": ["SP", "RJ", "SP", "MG"],
-        })
+        df = pd.DataFrame(
+            {
+                "city": ["SP", "RJ", "SP", "BH"],
+                "state": ["SP", "RJ", "SP", "MG"],
+            }
+        )
 
         cities = loader.get_unique_values(df, "city")
         states = loader.get_unique_values(df, "state")
@@ -106,3 +110,12 @@ class TestDataLoaderIntegration:
         # Verificar coordenadas válidas
         assert df["latitude"].between(-90, 90).all()
         assert df["longitude"].between(-180, 180).all()
+
+
+def test_flag_dados_de_exemplo():
+    from src.data.loader import DataLoader
+
+    loader = DataLoader(data_source="sample")
+    assert loader.using_sample_data is False
+    loader.load_deliveries()
+    assert loader.using_sample_data is True
